@@ -1,0 +1,84 @@
+/* styles.css - Diseño limpio, claro y de máxima legibilidad para Barbería Paco */
+@import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Playfair+Display:wght@700;900&display=swap');
+
+:root {
+  --primary-color: #b8860b;
+  --primary-hover: #996f08;
+  --bg-main: #f8fafc;
+  --card-bg: #ffffff;
+  --text-main: #0f172a;
+  --text-muted: #475569;
+}
+
+body {
+  font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  background-color: var(--bg-main);
+  color: var(--text-main);
+  line-height: 1.5;
+  -webkit-font-smoothing: antialiased;
+}
+
+.font-serif-title {
+  font-family: 'Playfair Display', Georgia, serif;
+}
+
+/* Enfoque en botones táctiles grandes para fácil uso con dedos */
+.touch-button {
+  min-height: 52px;
+  touch-action: manipulation;
+}
+
+/* Sombras suaves y limpias */
+.card-shadow {
+  box-shadow: 0 4px 20px -2px rgba(15, 23, 42, 0.08);
+}
+
+.card-shadow-hover:hover {
+  box-shadow: 0 10px 25px -4px rgba(15, 23, 42, 0.12);
+  transform: translateY(-2px);
+  transition: all 0.2s ease-in-out;
+}
+
+/* Indicador de turno seleccionado */
+.slot-selected {
+  background-color: #0f172a !important;
+  color: #ffffff !important;
+  border-color: #0f172a !important;
+  box-shadow: 0 4px 12px rgba(15, 23, 42, 0.25) !important;
+}
+
+/* Servicio seleccionado */
+.service-selected {
+  border-color: #b8860b !important;
+  background-color: #fefce8 !important;
+  box-shadow: 0 0 0 2px #b8860b !important;
+}
+
+/* Animación sutil de entrada */
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(6px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.animate-fade-in {
+  animation: fadeIn 0.25s ease-out forwards;
+}
+
+/* Estilo para barra de desplazamiento limpia */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: #f1f5f9;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #cbd5e1;
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #94a3b8;
+}
