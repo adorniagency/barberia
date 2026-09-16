@@ -491,25 +491,7 @@
         </button>
       </div>
 
-      <!-- Buscador rápido por Celular -->
-      <div class="pt-3 pb-2 flex-shrink-0">
-        <form onsubmit="handleSearchMyTurnos(event)" class="flex gap-2">
-          <div class="relative flex-1">
-            <input id="myTurnosPhoneInput" 
-                   type="tel" 
-                   inputmode="numeric" 
-                   pattern="[0-9]*" 
-                   oninput="this.value = this.value.replace(/[^0-9]/g, '')" 
-                   placeholder="Buscá por tu celular (ej: 3496512344)" 
-                   class="w-full bg-slate-50 border border-slate-300 rounded-xl px-3.5 py-2.5 text-xs sm:text-sm font-mono text-slate-900 focus:bg-white focus:border-amber-500 focus:outline-none">
-          </div>
-          <button type="submit" class="px-4 py-2.5 bg-slate-950 hover:bg-slate-800 text-white rounded-xl text-xs font-bold transition flex items-center gap-1.5 flex-shrink-0">
-            <i data-lucide="search" class="w-3.5 h-3.5"></i>
-            <span>Buscar</span>
-          </button>
-        </form>
-        <p id="myTurnosSearchNotice" class="text-[11px] text-slate-500 mt-1.5 text-left hidden"></p>
-      </div>
+
 
       <!-- Lista deslizable de turnos -->
       <div id="myAppointmentsList" class="flex-1 overflow-y-auto py-2 space-y-3 pr-1 text-left">

@@ -756,19 +756,11 @@ function saveClientBooking(id, phone) {
   }
 }
 
-function openMyAppointmentsModal(phoneQuery = null) {
+function openMyAppointmentsModal() {
   const modal = document.getElementById('myAppointmentsModal');
-  const input = document.getElementById('myTurnosPhoneInput');
   if (!modal) return;
 
-  const savedPhone = localStorage.getItem('barberia_paco_my_phone') || '';
-  const initialPhone = phoneQuery !== null ? phoneQuery : savedPhone;
-
-  if (input) {
-    input.value = initialPhone;
-  }
-
-  renderMyAppointmentsList(initialPhone);
+  renderMyAppointmentsList();
   modal.classList.remove('hidden');
   safeRenderIcons();
 }
@@ -778,33 +770,8 @@ function closeMyAppointmentsModal() {
   if (modal) modal.classList.add('hidden');
 }
 
-function handleSearchMyTurnos(e) {
-  if (e) e.preventDefault();
-  const input = document.getElementById('myTurnosPhoneInput');
-  const raw = input ? input.value.trim() : '';
-  const cleanPhone = raw.replace(/[^0-9]/g, '');
-
-  if (cleanPhone) {
-    try {
-      localStorage.setItem('barberia_paco_my_phone', cleanPhone);
-    } catch (err) {}
-  }
-
-  renderMyAppointmentsList(cleanPhone);
-}
-
-function clearMyTurnosPhoneSearch() {
-  const input = document.getElementById('myTurnosPhoneInput');
-  if (input) input.value = '';
-  try {
-    localStorage.removeItem('barberia_paco_my_phone');
-  } catch (err) {}
-  renderMyAppointmentsList('');
-}
-
-function renderMyAppointmentsList(phoneQuery = '') {
+function renderMyAppointmentsList() {
   const listContainer = document.getElementById('myAppointmentsList');
-  const notice = document.getElementById('myTurnosSearchNotice');
   if (!listContainer) return;
 
   appointments = getStoredAppointments();
@@ -816,25 +783,13 @@ function renderMyAppointmentsList(phoneQuery = '') {
     if (!Array.isArray(myIds)) myIds = [];
   } catch (e) {}
 
-  const cleanQuery = (phoneQuery || '').trim().replace(/[^0-9]/g, '');
-
-  if (notice) {
-    if (cleanQuery) {
-      notice.textContent = `Mostrando turnos asociados al teléfono: ${cleanQuery}`;
-      notice.classList.remove('hidden');
-    } else if (myIds.length > 0) {
-      notice.textContent = 'Mostrando turnos reservados desde este dispositivo:';
-      notice.classList.remove('hidden');
-    } else {
-      notice.classList.add('hidden');
-    }
-  }
+  const savedPhone = (localStorage.getItem('barberia_paco_my_phone') || '').trim().replace(/[^0-9]/g, '');
 
   // Filtrar turnos confirmados que correspondan al cliente
   const matched = appointments.filter(a => {
     if (a.status !== 'confirmed') return false;
     const matchId = myIds.includes(a.id);
-    const matchPhone = cleanQuery && a.phone && a.phone.replace(/[^0-9]/g, '') === cleanQuery;
+    const matchPhone = savedPhone && a.phone && a.phone.replace(/[^0-9]/g, '') === savedPhone;
     return matchId || matchPhone;
   });
 
@@ -847,7 +802,7 @@ function renderMyAppointmentsList(phoneQuery = '') {
         <div>
           <h4 class="font-bold text-slate-800 text-sm sm:text-base">No tenés turnos agendados</h4>
           <p class="text-xs text-slate-500 mt-1 max-w-xs mx-auto">
-            ${cleanQuery ? 'No encontramos turnos con ese número de teléfono.' : 'No encontramos reservas guardadas en este dispositivo. Podés buscar con tu celular arriba o agendar un turno nuevo.'}
+            No encontramos turnos activos guardados en este dispositivo.
           </p>
         </div>
         <button type="button" onclick="closeMyAppointmentsModal(); startBookingFlow();" class="inline-flex items-center gap-2 px-4 py-2.5 bg-slate-950 hover:bg-slate-800 text-white font-bold text-xs rounded-xl transition shadow-sm">
@@ -1013,9 +968,7 @@ function clientPromptCancelAppointment(appId) {
 
   alert('Tu turno ha sido cancelado con éxito.');
 
-  const input = document.getElementById('myTurnosPhoneInput');
-  const currentQuery = input ? input.value : '';
-  renderMyAppointmentsList(currentQuery);
+  renderMyAppointmentsList();
 }
 
 // ----------------------------------------------------
