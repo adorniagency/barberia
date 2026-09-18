@@ -1,13 +1,14 @@
-/* styles.css - Diseño limpio, claro y de máxima legibilidad para Barbería Paco */
-@import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Playfair+Display:wght@700;900&display=swap');
+/* styles.css - Diseño profesional, elegante y oscuro para Barbería Paco */
+@import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Playfair+Display:wght@700;800;900&display=swap');
 
 :root {
-  --primary-color: #b8860b;
-  --primary-hover: #996f08;
-  --bg-main: #f8fafc;
-  --card-bg: #ffffff;
-  --text-main: #0f172a;
-  --text-muted: #475569;
+  --primary-gold: #f59e0b;
+  --primary-gold-hover: #d97706;
+  --bg-main: #0c0e12;
+  --card-bg: #15181e;
+  --card-border: rgba(255, 255, 255, 0.08);
+  --text-main: #f8fafc;
+  --text-muted: #94a3b8;
 }
 
 body {
@@ -28,30 +29,36 @@ body {
   touch-action: manipulation;
 }
 
-/* Sombras suaves y limpias */
+/* Sombras suaves de profundidad en modo oscuro */
 .card-shadow {
-  box-shadow: 0 4px 20px -2px rgba(15, 23, 42, 0.08);
+  box-shadow: 0 14px 35px -5px rgba(0, 0, 0, 0.7), 0 0 0 1px rgba(255, 255, 255, 0.07);
 }
 
 .card-shadow-hover:hover {
-  box-shadow: 0 10px 25px -4px rgba(15, 23, 42, 0.12);
+  box-shadow: 0 20px 40px -5px rgba(0, 0, 0, 0.85), 0 0 0 1px rgba(245, 158, 11, 0.3);
   transform: translateY(-2px);
   transition: all 0.2s ease-in-out;
 }
 
-/* Indicador de turno seleccionado */
+/* Indicador de turno seleccionado (Dorado brillante con texto oscuro) */
 .slot-selected {
-  background-color: #0f172a !important;
-  color: #ffffff !important;
-  border-color: #0f172a !important;
-  box-shadow: 0 4px 12px rgba(15, 23, 42, 0.25) !important;
+  background: linear-gradient(135deg, #fbbf24, #d97706) !important;
+  color: #0c0e12 !important;
+  border-color: #fde68a !important;
+  box-shadow: 0 4px 18px rgba(245, 158, 11, 0.4) !important;
+  font-weight: 800 !important;
 }
 
-/* Servicio seleccionado */
+.slot-selected span {
+  color: #0c0e12 !important;
+  font-weight: 800 !important;
+}
+
+/* Servicio seleccionado (Borde dorado con resplandor) */
 .service-selected {
-  border-color: #b8860b !important;
-  background-color: #fefce8 !important;
-  box-shadow: 0 0 0 2px #b8860b !important;
+  border-color: #f59e0b !important;
+  background-color: rgba(245, 158, 11, 0.1) !important;
+  box-shadow: 0 0 0 1px #f59e0b, 0 10px 25px -5px rgba(0, 0, 0, 0.6) !important;
 }
 
 /* Animación sutil de entrada */
@@ -64,21 +71,22 @@ body {
   animation: fadeIn 0.25s ease-out forwards;
 }
 
-/* Estilo para barra de desplazamiento limpia */
+/* Estilo para barra de desplazamiento oscura */
 ::-webkit-scrollbar {
   width: 8px;
   height: 8px;
 }
 
 ::-webkit-scrollbar-track {
-  background: #f1f5f9;
+  background: #0c0e12;
 }
 
 ::-webkit-scrollbar-thumb {
-  background: #cbd5e1;
+  background: #242832;
   border-radius: 4px;
+  border: 2px solid #0c0e12;
 }
 
 ::-webkit-scrollbar-thumb:hover {
-  background: #94a3b8;
+  background: #373e4e;
 }
