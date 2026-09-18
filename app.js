@@ -301,14 +301,14 @@ function renderServicesList() {
   container.innerHTML = SERVICES.map(s => {
     const isSelected = currentBooking.service && currentBooking.service.id === s.id;
     return `
-      <div onclick="selectServiceAndNext('${s.id}')" class="p-4 sm:p-5 rounded-2xl border-2 cursor-pointer transition-all flex items-center justify-between ${isSelected ? 'service-selected' : 'bg-slate-50/70 border-slate-200 hover:border-slate-400 hover:bg-white'}">
+      <div onclick="selectServiceAndNext('${s.id}')" class="p-4 sm:p-5 rounded-2xl border-2 cursor-pointer transition-all flex items-center justify-between ${isSelected ? 'service-selected' : 'bg-[#0c0e12] border-white/10 hover:border-amber-400/50 hover:bg-[#11141b]'}">
         <div class="pr-2">
-          <h3 class="font-extrabold text-base sm:text-lg text-slate-900">${s.name}</h3>
-          <p class="text-xs text-slate-500 mt-1">${s.desc}</p>
+          <h3 class="font-extrabold text-base sm:text-lg text-white">${s.name}</h3>
+          <p class="text-xs text-slate-400 mt-1">${s.desc}</p>
         </div>
         <div class="text-right whitespace-nowrap pl-4 flex-shrink-0">
-          <span class="text-lg sm:text-xl font-extrabold text-slate-950 font-mono block">$${s.price.toLocaleString('es-AR')}</span>
-          <span class="text-xs text-slate-500 font-medium">⏱ ${s.duration} min</span>
+          <span class="text-lg sm:text-xl font-extrabold text-amber-400 font-mono block">$${s.price.toLocaleString('es-AR')}</span>
+          <span class="text-xs text-slate-400 font-medium">⏱ ${s.duration} min</span>
         </div>
       </div>
     `;
@@ -443,9 +443,9 @@ function renderSimpleTimesGrid() {
     // 1. Horario que ya pasó en el día de hoy
     if (hasPassed) {
       return `
-        <div class="p-2.5 rounded-xl border border-slate-200 bg-slate-100 text-center opacity-40 cursor-not-allowed select-none">
-          <span class="block font-mono text-xs line-through text-slate-400 font-medium">${time} hs</span>
-          <span class="text-[9px] text-slate-400 block mt-0.5">🕒 Pasó</span>
+        <div class="p-2.5 rounded-xl border border-white/5 bg-white/5 text-center opacity-40 cursor-not-allowed select-none">
+          <span class="block font-mono text-xs line-through text-slate-500 font-medium">${time} hs</span>
+          <span class="text-[9px] text-slate-500 block mt-0.5">🕒 Pasó</span>
         </div>
       `;
     }
@@ -453,9 +453,9 @@ function renderSimpleTimesGrid() {
     // 2. Horario ocupado por otro cliente
     if (isOccupied) {
       return `
-        <div class="p-2.5 rounded-xl border border-red-200 bg-red-50 text-center opacity-90 cursor-not-allowed select-none">
-          <span class="block font-mono text-xs line-through font-bold text-slate-500">${time} hs</span>
-          <span class="text-[10px] font-bold text-red-600 uppercase tracking-wide block mt-0.5">🔴 Ocupado</span>
+        <div class="p-2.5 rounded-xl border border-red-900/40 bg-red-950/30 text-center opacity-80 cursor-not-allowed select-none">
+          <span class="block font-mono text-xs line-through font-bold text-red-300">${time} hs</span>
+          <span class="text-[10px] font-bold text-red-400 uppercase tracking-wide block mt-0.5">🔴 Ocupado</span>
         </div>
       `;
     }
@@ -463,8 +463,8 @@ function renderSimpleTimesGrid() {
     // 3. Horario deshabilitado por el barbero
     if (isDisabled) {
       return `
-        <div class="p-2.5 rounded-xl border border-slate-200 bg-slate-100 text-center opacity-60 cursor-not-allowed select-none">
-          <span class="block font-mono text-xs line-through text-slate-400 font-semibold">${time} hs</span>
+        <div class="p-2.5 rounded-xl border border-white/5 bg-white/5 text-center opacity-50 cursor-not-allowed select-none">
+          <span class="block font-mono text-xs line-through text-slate-500 font-semibold">${time} hs</span>
           <span class="text-[10px] font-semibold text-slate-500 block mt-0.5">⛔ No atiende</span>
         </div>
       `;
@@ -472,9 +472,9 @@ function renderSimpleTimesGrid() {
 
     // 4. Horario libre
     return `
-      <button onclick="selectTimeAndNext('${time}')" class="p-2.5 rounded-xl border-2 text-center transition-all cursor-pointer ${isSelected ? 'slot-selected' : 'bg-white border-slate-300 hover:border-slate-900 text-slate-900 hover:bg-slate-50'}">
-        <span class="block font-mono font-extrabold text-xs sm:text-sm">${time} hs</span>
-        <span class="text-[10px] text-emerald-600 block font-bold mt-0.5">✓ Libre</span>
+      <button onclick="selectTimeAndNext('${time}')" class="p-2.5 rounded-xl border-2 text-center transition-all cursor-pointer ${isSelected ? 'slot-selected' : 'bg-[#0c0e12] border-white/10 hover:border-amber-400 text-white hover:bg-[#141720]'}">
+        <span class="block font-mono font-extrabold text-xs sm:text-sm text-white">${time} hs</span>
+        <span class="text-[10px] text-emerald-400 block font-bold mt-0.5">✓ Libre</span>
       </button>
     `;
   }
@@ -485,14 +485,14 @@ function renderSimpleTimesGrid() {
 
   container.innerHTML = `
     <!-- BLOQUE TURNO MAÑANA -->
-    <div class="p-3.5 bg-amber-50/40 rounded-2xl border border-amber-200/80 space-y-2.5">
+    <div class="p-3.5 bg-[#0c0e12] rounded-2xl border border-white/10 space-y-2.5">
       <div class="flex items-center justify-between">
-        <div class="flex items-center gap-1.5 text-slate-950 font-bold text-xs sm:text-sm">
+        <div class="flex items-center gap-1.5 text-white font-bold text-xs sm:text-sm">
           <span class="text-base">☀️</span>
           <span>Turno Mañana</span>
-          <span class="text-[11px] text-slate-500 font-normal">(09:00 a 12:30 hs)</span>
+          <span class="text-[11px] text-slate-400 font-normal">(09:00 a 12:30 hs)</span>
         </div>
-        <span class="text-[10px] font-extrabold px-2 py-0.5 rounded-full ${morningFreeCount > 0 ? 'bg-emerald-100 text-emerald-800 border border-emerald-300' : 'bg-slate-200 text-slate-500'}">
+        <span class="text-[10px] font-extrabold px-2 py-0.5 rounded-full ${morningFreeCount > 0 ? 'bg-emerald-950/60 text-emerald-300 border border-emerald-500/40' : 'bg-white/5 text-slate-500'}">
           ${morningFreeCount > 0 ? `${morningFreeCount} disponibles` : 'Sin cupos'}
         </span>
       </div>
@@ -502,14 +502,14 @@ function renderSimpleTimesGrid() {
     </div>
 
     <!-- BLOQUE TURNO TARDE -->
-    <div class="p-3.5 bg-slate-100/60 rounded-2xl border border-slate-200/80 space-y-2.5">
+    <div class="p-3.5 bg-[#0c0e12] rounded-2xl border border-white/10 space-y-2.5">
       <div class="flex items-center justify-between">
-        <div class="flex items-center gap-1.5 text-slate-950 font-bold text-xs sm:text-sm">
+        <div class="flex items-center gap-1.5 text-white font-bold text-xs sm:text-sm">
           <span class="text-base">🌙</span>
           <span>Turno Tarde</span>
-          <span class="text-[11px] text-slate-500 font-normal">(16:30 a 20:00 hs)</span>
+          <span class="text-[11px] text-slate-400 font-normal">(16:30 a 20:00 hs)</span>
         </div>
-        <span class="text-[10px] font-extrabold px-2 py-0.5 rounded-full ${afternoonFreeCount > 0 ? 'bg-emerald-100 text-emerald-800 border border-emerald-300' : 'bg-slate-200 text-slate-500'}">
+        <span class="text-[10px] font-extrabold px-2 py-0.5 rounded-full ${afternoonFreeCount > 0 ? 'bg-emerald-950/60 text-emerald-300 border border-emerald-500/40' : 'bg-white/5 text-slate-500'}">
           ${afternoonFreeCount > 0 ? `${afternoonFreeCount} disponibles` : 'Sin cupos'}
         </span>
       </div>
@@ -538,14 +538,14 @@ function renderSummary() {
   summary.innerHTML = `
     <div class="flex items-center justify-between">
       <div>
-        <p class="font-bold text-slate-900 text-sm">
-          ✂️ ${s.name} — <strong class="font-mono text-amber-700">$${s.price.toLocaleString('es-AR')}</strong>
+        <p class="font-bold text-white text-sm">
+          ✂️ ${s.name} — <strong class="font-mono text-amber-400">$${s.price.toLocaleString('es-AR')}</strong>
         </p>
-        <p class="text-slate-600 text-xs mt-0.5">
-          📅 ${dateStr} a las <strong class="text-slate-900 font-mono">${currentBooking.time || '--:--'} hs</strong>
+        <p class="text-slate-400 text-xs mt-0.5">
+          📅 ${dateStr} a las <strong class="text-white font-mono">${currentBooking.time || '--:--'} hs</strong>
         </p>
       </div>
-      <button onclick="goToStep(2)" class="text-xs text-amber-800 underline font-semibold">Cambiar</button>
+      <button onclick="goToStep(2)" class="text-xs text-amber-400 hover:text-amber-300 underline font-semibold transition">Cambiar</button>
     </div>
   `;
 }
@@ -642,34 +642,34 @@ function showSimpleSuccess(app) {
   const waUrl = `https://wa.me/${BARBER_WHATSAPP}?text=${encodeURIComponent(msg)}`;
 
   details.innerHTML = `
-    <div class="flex justify-between border-b border-slate-200 pb-1.5">
-      <span class="text-slate-500">Cliente:</span>
-      <strong class="text-slate-900">${app.clientName}</strong>
+    <div class="flex justify-between border-b border-white/10 pb-1.5">
+      <span class="text-slate-400">Cliente:</span>
+      <strong class="text-white font-bold">${app.clientName}</strong>
     </div>
-    <div class="flex justify-between border-b border-slate-200 pb-1.5">
-      <span class="text-slate-500">Teléfono:</span>
-      <strong class="text-slate-900 font-mono">${app.phone}</strong>
+    <div class="flex justify-between border-b border-white/10 pb-1.5">
+      <span class="text-slate-400">Teléfono:</span>
+      <strong class="text-white font-mono">${app.phone}</strong>
     </div>
-    <div class="flex justify-between border-b border-slate-200 pb-1.5">
-      <span class="text-slate-500">Servicio:</span>
-      <strong class="text-slate-900">${s.name} ($${s.price.toLocaleString('es-AR')})</strong>
+    <div class="flex justify-between border-b border-white/10 pb-1.5">
+      <span class="text-slate-400">Servicio:</span>
+      <strong class="text-white">${s.name} ($${s.price.toLocaleString('es-AR')})</strong>
     </div>
-    <div class="flex justify-between border-b border-slate-200 pb-1.5">
-      <span class="text-slate-500">Día y Hora:</span>
-      <strong class="text-amber-700">${formatDateDisplay(app.date)} — ${app.time} hs</strong>
+    <div class="flex justify-between border-b border-white/10 pb-1.5">
+      <span class="text-slate-400">Día y Hora:</span>
+      <strong class="text-amber-400 font-bold">${formatDateDisplay(app.date)} — ${app.time} hs</strong>
     </div>
     ${app.notes ? `
-    <div class="flex justify-between border-b border-slate-200 pb-1.5">
-      <span class="text-slate-500">Aclaración:</span>
-      <span class="text-slate-800 font-medium italic text-right max-w-[200px]">"${app.notes}"</span>
+    <div class="flex justify-between border-b border-white/10 pb-1.5">
+      <span class="text-slate-400">Aclaración:</span>
+      <span class="text-slate-300 font-medium italic text-right max-w-[200px]">"${app.notes}"</span>
     </div>
     ` : ''}
-    <div class="flex justify-between pt-1 text-slate-600">
+    <div class="flex justify-between pt-1 text-slate-400">
       <span>Lugar:</span>
-      <span class="font-medium text-slate-900">Belgrano 1450, Esperanza</span>
+      <span class="font-medium text-slate-200">Belgrano 1450, Esperanza</span>
     </div>
-    <div class="mt-3 pt-3 border-t border-slate-200">
-      <a href="${waUrl}" target="_blank" class="w-full flex items-center justify-center gap-2 py-2.5 px-3 bg-emerald-600 hover:bg-emerald-700 text-white font-bold rounded-xl text-xs transition shadow-sm">
+    <div class="mt-3 pt-3 border-t border-white/10">
+      <a href="${waUrl}" target="_blank" class="w-full flex items-center justify-center gap-2 py-2.5 px-3 bg-emerald-600 hover:bg-emerald-500 text-white font-bold rounded-xl text-xs transition shadow-md shadow-emerald-950/50">
         <i data-lucide="message-circle" class="w-4 h-4"></i>
         <span>Enviar aviso por WhatsApp a Paco (3496-446229)</span>
       </a>
@@ -795,18 +795,18 @@ function renderMyAppointmentsList() {
 
   if (matched.length === 0) {
     listContainer.innerHTML = `
-      <div class="py-10 px-4 text-center bg-slate-50 rounded-2xl border border-dashed border-slate-200 space-y-3">
-        <div class="w-12 h-12 rounded-2xl bg-amber-100 text-amber-600 flex items-center justify-center mx-auto">
+      <div class="py-10 px-4 text-center bg-[#0c0e12] rounded-2xl border border-dashed border-white/15 space-y-3">
+        <div class="w-12 h-12 rounded-2xl bg-amber-500/20 text-amber-400 flex items-center justify-center mx-auto">
           <i data-lucide="calendar-x" class="w-6 h-6"></i>
         </div>
         <div>
-          <h4 class="font-bold text-slate-800 text-sm sm:text-base">No tenés turnos agendados</h4>
-          <p class="text-xs text-slate-500 mt-1 max-w-xs mx-auto">
+          <h4 class="font-bold text-white text-sm sm:text-base">No tenés turnos agendados</h4>
+          <p class="text-xs text-slate-400 mt-1 max-w-xs mx-auto">
             No encontramos turnos activos guardados en este dispositivo.
           </p>
         </div>
-        <button type="button" onclick="closeMyAppointmentsModal(); startBookingFlow();" class="inline-flex items-center gap-2 px-4 py-2.5 bg-slate-950 hover:bg-slate-800 text-white font-bold text-xs rounded-xl transition shadow-sm">
-          <i data-lucide="calendar-plus" class="w-3.5 h-3.5 text-amber-400"></i>
+        <button type="button" onclick="closeMyAppointmentsModal(); startBookingFlow();" class="inline-flex items-center gap-2 px-4 py-2.5 bg-gradient-to-r from-amber-400 to-amber-500 hover:brightness-110 text-slate-950 font-extrabold text-xs rounded-xl transition shadow-md shadow-amber-500/20">
+          <i data-lucide="calendar-plus" class="w-3.5 h-3.5 stroke-[2.5]"></i>
           <span>Pedir Turno Ahora</span>
         </button>
       </div>
@@ -836,10 +836,10 @@ function renderMyAppointmentsList() {
 
   if (upcoming.length > 0) {
     html += `
-      <div class="space-y-2.5">
+      <div class="space-y-3">
         <div class="flex items-center justify-between pb-1">
-          <span class="text-xs font-extrabold text-slate-900 uppercase tracking-wider flex items-center gap-1.5">
-            <span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
+          <span class="text-xs font-extrabold text-amber-400 uppercase tracking-wider flex items-center gap-1.5">
+            <span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
             Próximos Turnos (${upcoming.length})
           </span>
         </div>
@@ -850,47 +850,47 @@ function renderMyAppointmentsList() {
       const dateStr = formatDateDisplay(app.date);
 
       html += `
-        <div class="p-4 rounded-2xl border-2 border-amber-300 bg-amber-50/70 shadow-sm space-y-3 transition">
+        <div class="p-4 rounded-2xl border border-amber-500/30 bg-[#0c0e12] shadow-md space-y-3 transition">
           <div class="flex items-start justify-between gap-2">
             <div>
-              <span class="inline-block px-2.5 py-1 rounded-lg bg-amber-500 text-slate-950 text-xs font-mono font-extrabold shadow-xs">
+              <span class="inline-block px-2.5 py-1 rounded-lg bg-amber-500 text-slate-950 text-xs font-mono font-extrabold shadow-sm">
                 ${app.time} hs
               </span>
-              <h4 class="font-bold text-slate-950 text-sm mt-1.5">${dateStr}</h4>
+              <h4 class="font-bold text-white text-sm mt-1.5">${dateStr}</h4>
             </div>
-            <span class="text-[10px] font-bold bg-emerald-100 text-emerald-800 border border-emerald-300 px-2 py-0.5 rounded-full flex items-center gap-1">
+            <span class="text-[10px] font-bold bg-emerald-950/60 text-emerald-400 border border-emerald-500/40 px-2 py-0.5 rounded-full flex items-center gap-1">
               ✓ Confirmado
             </span>
           </div>
 
-          <div class="bg-white/90 p-3 rounded-xl border border-amber-200 text-xs text-slate-700 space-y-1">
+          <div class="bg-[#15181e] p-3 rounded-xl border border-white/10 text-xs text-slate-300 space-y-1.5">
             <div class="flex justify-between">
-              <span class="text-slate-500">Servicio:</span>
-              <strong class="text-slate-950 font-bold">${s.name} ($${s.price.toLocaleString('es-AR')})</strong>
+              <span class="text-slate-400">Servicio:</span>
+              <strong class="text-white font-bold">${s.name} ($${s.price.toLocaleString('es-AR')})</strong>
             </div>
             <div class="flex justify-between">
-              <span class="text-slate-500">A nombre de:</span>
-              <strong class="text-slate-900">${app.clientName}</strong>
+              <span class="text-slate-400">A nombre de:</span>
+              <strong class="text-white">${app.clientName}</strong>
             </div>
             <div class="flex justify-between">
-              <span class="text-slate-500">Lugar:</span>
-              <span class="text-slate-900 font-medium">Belgrano 1450, Esperanza</span>
+              <span class="text-slate-400">Lugar:</span>
+              <span class="text-slate-200 font-medium">Belgrano 1450, Esperanza</span>
             </div>
             ${app.notes ? `
-            <div class="flex justify-between border-t border-amber-100 pt-1 mt-1">
-              <span class="text-slate-500 flex-shrink-0">Aclaración:</span>
-              <span class="text-amber-900 font-medium italic text-right pl-2">"${app.notes}"</span>
+            <div class="flex justify-between border-t border-white/10 pt-1.5 mt-1">
+              <span class="text-slate-400 flex-shrink-0">Aclaración:</span>
+              <span class="text-amber-300 font-medium italic text-right pl-2">"${app.notes}"</span>
             </div>
             ` : ''}
           </div>
 
           <div class="flex items-center justify-between gap-2 pt-0.5">
-            <button type="button" onclick="clientPromptCancelAppointment('${app.id}')" class="px-3 py-1.5 bg-white hover:bg-red-50 text-red-600 border border-red-200 hover:border-red-300 rounded-xl text-xs font-bold transition flex items-center gap-1 shadow-xs">
+            <button type="button" onclick="clientPromptCancelAppointment('${app.id}')" class="px-3 py-1.5 bg-red-950/40 hover:bg-red-900/60 text-red-300 border border-red-800/40 rounded-xl text-xs font-bold transition flex items-center gap-1 shadow-xs">
               <i data-lucide="x" class="w-3.5 h-3.5"></i>
               <span>Cancelar turno</span>
             </button>
 
-            <a href="https://wa.me/${BARBER_WHATSAPP}?text=${encodeURIComponent('Hola Paco, te consulto por mi turno de ' + s.name + ' para el ' + dateStr + ' a las ' + app.time + ' hs' + (app.notes ? ' (Aclaración: ' + app.notes + ')' : ''))}" target="_blank" class="px-3 py-1.5 bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl text-xs font-bold transition flex items-center gap-1 shadow-xs">
+            <a href="https://wa.me/${BARBER_WHATSAPP}?text=${encodeURIComponent('Hola Paco, te consulto por mi turno de ' + s.name + ' para el ' + dateStr + ' a las ' + app.time + ' hs' + (app.notes ? ' (Aclaración: ' + app.notes + ')' : ''))}" target="_blank" class="px-3 py-1.5 bg-emerald-600 hover:bg-emerald-500 text-white rounded-xl text-xs font-bold transition flex items-center gap-1 shadow-xs">
               <i data-lucide="message-circle" class="w-3.5 h-3.5"></i>
               <span>Avisar por WhatsApp</span>
             </a>
@@ -904,8 +904,8 @@ function renderMyAppointmentsList() {
 
   if (past.length > 0) {
     html += `
-      <div class="pt-2 space-y-2">
-        <span class="text-[11px] font-bold text-slate-400 uppercase tracking-wider block">
+      <div class="pt-3 space-y-2">
+        <span class="text-[11px] font-bold text-slate-500 uppercase tracking-wider block">
           Historial / Turnos Anteriores (${past.length})
         </span>
     `;
@@ -915,16 +915,16 @@ function renderMyAppointmentsList() {
       const dateStr = formatDateDisplay(app.date);
 
       html += `
-        <div class="p-3 rounded-xl border border-slate-200 bg-slate-100/70 text-slate-500 text-xs flex items-center justify-between gap-2 opacity-75">
+        <div class="p-3 rounded-xl border border-white/5 bg-[#0c0e12] text-slate-400 text-xs flex items-center justify-between gap-2 opacity-70">
           <div class="flex items-center gap-2">
-            <span class="font-mono text-slate-600 font-semibold">${app.time} hs</span>
+            <span class="font-mono text-slate-300 font-semibold">${app.time} hs</span>
             <div>
-              <span class="font-bold text-slate-800 block">${dateStr}</span>
-              <span class="text-[11px] text-slate-500">${s.name} • ${app.clientName}</span>
-              ${app.notes ? `<span class="text-[10px] text-slate-400 italic block mt-0.5">"${app.notes}"</span>` : ''}
+              <span class="font-bold text-white block">${dateStr}</span>
+              <span class="text-[11px] text-slate-400">${s.name} • ${app.clientName}</span>
+              ${app.notes ? `<span class="text-[10px] text-slate-500 italic block mt-0.5">"${app.notes}"</span>` : ''}
             </div>
           </div>
-          <span class="text-[10px] text-slate-400 font-medium bg-slate-200 px-2 py-0.5 rounded">
+          <span class="text-[10px] text-slate-400 font-medium bg-white/5 px-2 py-0.5 rounded border border-white/5">
             Finalizado
           </span>
         </div>
@@ -1200,14 +1200,14 @@ function adminSwitchTab(tab) {
   const contentHorarios = document.getElementById('adminTabContentHorarios');
 
   if (tab === 'cortes') {
-    tabBtnCortes.className = 'flex-1 py-3 border-b-2 border-slate-950 text-slate-950 flex items-center justify-center gap-2 transition';
-    tabBtnHorarios.className = 'flex-1 py-3 border-b-2 border-transparent text-slate-500 hover:text-slate-900 flex items-center justify-center gap-2 transition';
+    tabBtnCortes.className = 'flex-1 py-3 border-b-2 border-amber-400 text-amber-400 flex items-center justify-center gap-2 transition';
+    tabBtnHorarios.className = 'flex-1 py-3 border-b-2 border-transparent text-slate-400 hover:text-white flex items-center justify-center gap-2 transition';
     contentCortes.classList.remove('hidden');
     contentHorarios.classList.add('hidden');
     updateAdminAppointments();
   } else {
-    tabBtnCortes.className = 'flex-1 py-3 border-b-2 border-transparent text-slate-500 hover:text-slate-900 flex items-center justify-center gap-2 transition';
-    tabBtnHorarios.className = 'flex-1 py-3 border-b-2 border-slate-950 text-slate-950 flex items-center justify-center gap-2 transition';
+    tabBtnCortes.className = 'flex-1 py-3 border-b-2 border-transparent text-slate-400 hover:text-white flex items-center justify-center gap-2 transition';
+    tabBtnHorarios.className = 'flex-1 py-3 border-b-2 border-amber-400 text-amber-400 flex items-center justify-center gap-2 transition';
     contentCortes.classList.add('hidden');
     contentHorarios.classList.remove('hidden');
     renderAdminScheduleSlots();
@@ -1238,9 +1238,9 @@ function updateAdminAppointments() {
 
   if (dayApps.length === 0) {
     container.innerHTML = `
-      <div class="py-16 text-center text-slate-400 text-sm bg-white rounded-2xl border border-dashed border-slate-200 p-8 shadow-xs">
-        <i data-lucide="calendar-x" class="w-10 h-10 mx-auto mb-3 text-slate-300"></i>
-        <p class="font-bold text-slate-700 text-base">No hay cortes agendados para esta fecha.</p>
+      <div class="py-16 text-center text-slate-400 text-sm bg-[#15181e] rounded-2xl border border-dashed border-white/10 p-8 shadow-xs">
+        <i data-lucide="calendar-x" class="w-10 h-10 mx-auto mb-3 text-slate-500"></i>
+        <p class="font-bold text-white text-base">No hay cortes agendados para esta fecha.</p>
         <p class="text-xs text-slate-400 mt-1">Los turnos que reserven los clientes aparecerán acá en detalle.</p>
       </div>
     `;
@@ -1253,26 +1253,26 @@ function updateAdminAppointments() {
     const hasPassed = isTimePassed(adminSelectedDate, app.time);
 
     return `
-      <div class="p-4 sm:p-5 rounded-2xl border ${hasPassed ? 'border-slate-200 bg-slate-100/70 opacity-80' : 'border-slate-200 bg-white hover:border-slate-300'} flex flex-col sm:flex-row sm:items-center justify-between gap-3 shadow-xs transition">
+      <div class="p-4 sm:p-5 rounded-2xl border ${hasPassed ? 'border-white/5 bg-[#12141a]/60 opacity-75' : 'border-white/10 bg-[#15181e] hover:border-amber-400/40'} flex flex-col sm:flex-row sm:items-center justify-between gap-3 shadow-md transition">
         <div class="flex items-center gap-3.5">
-          <span class="w-16 py-2.5 rounded-xl ${hasPassed ? 'bg-slate-400' : 'bg-slate-950'} text-white text-sm font-mono font-extrabold text-center block flex-shrink-0 shadow-xs">
+          <span class="w-16 py-2.5 rounded-xl ${hasPassed ? 'bg-white/10 text-slate-400' : 'bg-gradient-to-br from-amber-400 to-amber-500 text-slate-950 font-black'} text-sm font-mono text-center block flex-shrink-0 shadow-xs">
             ${app.time} hs
           </span>
           <div>
             <div class="flex items-center gap-2">
-              <h4 class="font-extrabold text-base text-slate-950">${app.clientName}</h4>
-              ${hasPassed ? '<span class="text-[10px] text-slate-500 font-bold bg-slate-200 px-2 py-0.5 rounded-full">🕒 Ya pasó</span>' : '<span class="text-[10px] text-emerald-700 font-bold bg-emerald-100 px-2 py-0.5 rounded-full">Confirmado</span>'}
+              <h4 class="font-extrabold text-base text-white">${app.clientName}</h4>
+              ${hasPassed ? '<span class="text-[10px] text-slate-400 font-bold bg-white/10 px-2 py-0.5 rounded-full">🕒 Ya pasó</span>' : '<span class="text-[10px] text-emerald-400 font-bold bg-emerald-950/60 border border-emerald-500/30 px-2 py-0.5 rounded-full">Confirmado</span>'}
             </div>
-            <p class="text-xs sm:text-sm text-slate-600 mt-1 flex flex-wrap items-center gap-2">
-              <span class="font-medium text-amber-700">${s.name}</span>
-              <span class="text-slate-300">•</span>
-              <span class="inline-flex items-center gap-1 font-mono font-bold text-slate-900">
-                📞 <a href="tel:${app.phone}" class="hover:underline">${app.phone}</a>
+            <p class="text-xs sm:text-sm text-slate-400 mt-1 flex flex-wrap items-center gap-2">
+              <span class="font-medium text-amber-400">${s.name}</span>
+              <span class="text-slate-600">•</span>
+              <span class="inline-flex items-center gap-1 font-mono font-bold text-slate-200">
+                📞 <a href="tel:${app.phone}" class="hover:underline hover:text-amber-400">${app.phone}</a>
               </span>
             </p>
             ${app.notes ? `
-            <div class="mt-2 p-2 bg-amber-50 border border-amber-200/90 rounded-xl text-xs text-amber-950 flex items-start gap-1.5">
-              <span class="font-bold text-amber-800 flex-shrink-0">💬 Aclaración:</span>
+            <div class="mt-2 p-2 bg-[#0c0e12] border border-white/10 rounded-xl text-xs text-amber-200 flex items-start gap-1.5">
+              <span class="font-bold text-amber-400 flex-shrink-0">💬 Aclaración:</span>
               <span class="italic font-medium">${app.notes}</span>
             </div>
             ` : ''}
@@ -1281,11 +1281,11 @@ function updateAdminAppointments() {
 
         <div class="flex items-center gap-2 self-end sm:self-auto pt-2 sm:pt-0">
           ${hasPassed ? `
-            <span class="text-xs font-semibold text-slate-400 bg-slate-100 border border-slate-200 px-3 py-1.5 rounded-xl select-none">
+            <span class="text-xs font-semibold text-slate-500 bg-white/5 border border-white/5 px-3 py-1.5 rounded-xl select-none">
               Finalizado
             </span>
           ` : `
-            <button onclick="adminPromptCancelAppointment('${app.id}')" title="Cancelar este turno" class="px-3.5 py-2 bg-red-50 hover:bg-red-100 text-red-700 border border-red-200 rounded-xl text-xs font-bold transition flex items-center gap-1.5 flex-shrink-0 shadow-xs">
+            <button onclick="adminPromptCancelAppointment('${app.id}')" title="Cancelar este turno" class="px-3.5 py-2 bg-red-950/40 hover:bg-red-900/60 text-red-300 border border-red-800/40 rounded-xl text-xs font-bold transition flex items-center gap-1.5 flex-shrink-0 shadow-xs">
               <i data-lucide="trash-2" class="w-4 h-4"></i>
               <span>Cancelar turno</span>
             </button>
@@ -1320,26 +1320,26 @@ function adminPromptCancelAppointment(appId) {
   const dateStr = formatDateDisplay(app.date);
 
   details.innerHTML = `
-    <div class="flex justify-between border-b border-slate-200/80 pb-1.5">
-      <span class="text-slate-500">Cliente:</span>
-      <strong class="text-slate-950 font-bold">${app.clientName}</strong>
+    <div class="flex justify-between border-b border-white/10 pb-1.5">
+      <span class="text-slate-400">Cliente:</span>
+      <strong class="text-white font-bold">${app.clientName}</strong>
     </div>
-    <div class="flex justify-between border-b border-slate-200/80 pb-1.5">
-      <span class="text-slate-500">Teléfono:</span>
-      <strong class="text-slate-950 font-mono">${app.phone}</strong>
+    <div class="flex justify-between border-b border-white/10 pb-1.5">
+      <span class="text-slate-400">Teléfono:</span>
+      <strong class="text-white font-mono">${app.phone}</strong>
     </div>
-    <div class="flex justify-between border-b border-slate-200/80 pb-1.5">
-      <span class="text-slate-500">Servicio:</span>
-      <strong class="text-slate-950">${s.name}</strong>
+    <div class="flex justify-between border-b border-white/10 pb-1.5">
+      <span class="text-slate-400">Servicio:</span>
+      <strong class="text-white">${s.name}</strong>
     </div>
     <div class="flex justify-between pt-0.5">
-      <span class="text-slate-500">Turno reservado:</span>
-      <strong class="text-amber-700 font-bold">${dateStr} a las ${app.time} hs</strong>
+      <span class="text-slate-400">Turno reservado:</span>
+      <strong class="text-amber-400 font-bold">${dateStr} a las ${app.time} hs</strong>
     </div>
     ${app.notes ? `
-    <div class="flex justify-between border-t border-slate-200/80 pt-1.5 mt-1">
-      <span class="text-slate-500">Aclaración:</span>
-      <span class="text-slate-900 font-medium italic text-right max-w-[200px]">"${app.notes}"</span>
+    <div class="flex justify-between border-t border-white/10 pt-1.5 mt-1">
+      <span class="text-slate-400">Aclaración:</span>
+      <span class="text-slate-300 font-medium italic text-right max-w-[200px]">"${app.notes}"</span>
     </div>
     ` : ''}
   `;
@@ -1417,12 +1417,12 @@ function renderAdminScheduleSlots() {
     // 1. Horario que ya pasó (sin reserva)
     if (hasPassed && !bookedApp) {
       return `
-        <div class="p-3 rounded-2xl border border-slate-200 bg-slate-100/60 flex items-center justify-between gap-2 opacity-55 select-none shadow-xs">
+        <div class="p-3 rounded-2xl border border-white/5 bg-white/5 flex items-center justify-between gap-2 opacity-50 select-none shadow-xs">
           <div class="flex items-center gap-2.5">
-            <span class="font-mono text-xs text-slate-400 line-through bg-slate-200 px-2 py-1 rounded-md">${time} hs</span>
-            <span class="text-xs text-slate-400">🕒 Ya transcurrido</span>
+            <span class="font-mono text-xs text-slate-500 line-through bg-white/5 px-2 py-1 rounded-md">${time} hs</span>
+            <span class="text-xs text-slate-500">🕒 Ya transcurrido</span>
           </div>
-          <span class="text-[10px] text-slate-400 font-semibold px-2 py-0.5 bg-slate-200 rounded">Inactivo</span>
+          <span class="text-[10px] text-slate-500 font-semibold px-2 py-0.5 bg-white/5 rounded border border-white/5">Inactivo</span>
         </div>
       `;
     }
@@ -1434,32 +1434,32 @@ function renderAdminScheduleSlots() {
       // Si ya pasó, no se permite eliminar ni cancelar
       if (hasPassed) {
         return `
-          <div class="p-3.5 rounded-2xl border border-slate-200 bg-slate-100/70 flex items-center justify-between gap-2 opacity-65 select-none shadow-xs">
+          <div class="p-3.5 rounded-2xl border border-white/5 bg-[#12141a]/60 flex items-center justify-between gap-2 opacity-65 select-none shadow-xs">
             <div class="flex items-center gap-2.5">
-              <span class="font-mono text-xs text-slate-400 line-through bg-slate-200 px-2.5 py-1.5 rounded-lg">${time} hs</span>
+              <span class="font-mono text-xs text-slate-500 line-through bg-white/5 px-2.5 py-1.5 rounded-lg">${time} hs</span>
               <div>
-                <span class="text-xs font-bold text-slate-600 block">${bookedApp.clientName} (Finalizado)</span>
-                <span class="text-[11px] text-slate-400 block">${s.name} • 📞 ${bookedApp.phone}</span>
-                ${bookedApp.notes ? `<span class="text-[10px] text-slate-400 italic block mt-0.5">💬 "${bookedApp.notes}"</span>` : ''}
+                <span class="text-xs font-bold text-slate-400 block">${bookedApp.clientName} (Finalizado)</span>
+                <span class="text-[11px] text-slate-500 block">${s.name} • 📞 ${bookedApp.phone}</span>
+                ${bookedApp.notes ? `<span class="text-[10px] text-slate-500 italic block mt-0.5">💬 "${bookedApp.notes}"</span>` : ''}
               </div>
             </div>
-            <span class="text-[10px] text-slate-400 font-semibold px-2.5 py-1 bg-slate-200 rounded-lg">Finalizado</span>
+            <span class="text-[10px] text-slate-400 font-semibold px-2.5 py-1 bg-white/10 rounded-lg border border-white/5">Finalizado</span>
           </div>
         `;
       }
 
       // Horario futuro/activo: se puede cancelar
       return `
-        <div class="p-3.5 rounded-2xl border border-amber-300 bg-amber-50/80 flex items-center justify-between gap-2 shadow-xs">
+        <div class="p-3.5 rounded-2xl border border-amber-500/30 bg-[#0c0e12] flex items-center justify-between gap-2 shadow-sm">
           <div class="flex items-center gap-2.5">
-            <span class="font-mono font-extrabold text-xs bg-amber-500 text-slate-950 px-2.5 py-1.5 rounded-lg shadow-xs">${time} hs</span>
+            <span class="font-mono font-extrabold text-xs bg-gradient-to-br from-amber-400 to-amber-500 text-slate-950 px-2.5 py-1.5 rounded-lg shadow-xs">${time} hs</span>
             <div>
-              <span class="text-xs sm:text-sm font-bold text-slate-900 block">${bookedApp.clientName}</span>
-              <span class="text-[11px] text-slate-500 block">${s.name} • 📞 ${bookedApp.phone}</span>
-              ${bookedApp.notes ? `<span class="text-[11px] text-amber-900 font-medium italic block mt-0.5">💬 "${bookedApp.notes}"</span>` : ''}
+              <span class="text-xs sm:text-sm font-bold text-white block">${bookedApp.clientName}</span>
+              <span class="text-[11px] text-slate-400 block">${s.name} • 📞 ${bookedApp.phone}</span>
+              ${bookedApp.notes ? `<span class="text-[11px] text-amber-300 font-medium italic block mt-0.5">💬 "${bookedApp.notes}"</span>` : ''}
             </div>
           </div>
-          <button onclick="adminPromptCancelAppointment('${bookedApp.id}')" class="px-3 py-1.5 text-xs font-bold bg-white text-red-600 border border-red-300 rounded-xl hover:bg-red-50 flex-shrink-0 transition shadow-xs">
+          <button onclick="adminPromptCancelAppointment('${bookedApp.id}')" class="px-3 py-1.5 text-xs font-bold bg-red-950/40 text-red-300 border border-red-800/40 rounded-xl hover:bg-red-900/50 flex-shrink-0 transition shadow-xs">
             Cancelar
           </button>
         </div>
@@ -1470,23 +1470,23 @@ function renderAdminScheduleSlots() {
     if (isEliminado) {
       if (hasPassed) {
         return `
-          <div class="p-3 rounded-2xl border border-slate-200 bg-slate-100/50 flex items-center justify-between gap-2 opacity-50 select-none">
+          <div class="p-3 rounded-2xl border border-white/5 bg-white/5 flex items-center justify-between gap-2 opacity-50 select-none">
             <div class="flex items-center gap-2.5">
-              <span class="font-mono text-xs line-through text-slate-400 bg-slate-200 px-2 py-1 rounded-md">${time} hs</span>
-              <span class="text-xs text-slate-400">⛔ No atendió (Pasó)</span>
+              <span class="font-mono text-xs line-through text-slate-500 bg-white/5 px-2 py-1 rounded-md">${time} hs</span>
+              <span class="text-xs text-slate-500">⛔ No atendió (Pasó)</span>
             </div>
-            <span class="text-[10px] text-slate-400 font-semibold px-2 py-0.5 bg-slate-200 rounded">Inactivo</span>
+            <span class="text-[10px] text-slate-500 font-semibold px-2 py-0.5 bg-white/5 rounded border border-white/5">Inactivo</span>
           </div>
         `;
       }
 
       return `
-        <div class="p-3.5 rounded-2xl border border-red-200 bg-red-50/60 flex items-center justify-between gap-2 shadow-xs">
+        <div class="p-3.5 rounded-2xl border border-red-900/40 bg-red-950/25 flex items-center justify-between gap-2 shadow-sm">
           <div class="flex items-center gap-2.5">
-            <span class="font-mono font-bold text-xs line-through text-red-400 bg-red-100 px-2 py-1 rounded-md">${time} hs</span>
-            <span class="text-xs font-bold text-red-600">⛔ Eliminado</span>
+            <span class="font-mono font-bold text-xs line-through text-red-300 bg-red-950/50 px-2.5 py-1 rounded-md border border-red-800/40">${time} hs</span>
+            <span class="text-xs font-bold text-red-400">⛔ Eliminado</span>
           </div>
-          <button onclick="adminToggleSlot('${adminSelectedDate}', '${time}', true)" class="px-3.5 py-1.5 text-xs font-bold bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl transition flex items-center gap-1 shadow-xs flex-shrink-0">
+          <button onclick="adminToggleSlot('${adminSelectedDate}', '${time}', true)" class="px-3.5 py-1.5 text-xs font-bold bg-emerald-600 hover:bg-emerald-500 text-white rounded-xl transition flex items-center gap-1 shadow-xs flex-shrink-0">
             <i data-lucide="check" class="w-3.5 h-3.5"></i>
             <span>Habilitar</span>
           </button>
@@ -1496,12 +1496,12 @@ function renderAdminScheduleSlots() {
 
     // 4. Horario libre disponible en fecha actual o futura
     return `
-      <div class="p-3.5 rounded-2xl border border-slate-200 bg-white flex items-center justify-between gap-2 hover:border-slate-300 transition shadow-xs">
+      <div class="p-3.5 rounded-2xl border border-white/10 bg-[#15181e] flex items-center justify-between gap-2 hover:border-amber-400/40 transition shadow-sm">
         <div class="flex items-center gap-2.5">
-          <span class="font-mono font-bold text-xs bg-slate-100 text-slate-900 px-2.5 py-1 rounded-md border border-slate-200">${time} hs</span>
-          <span class="text-xs font-semibold text-emerald-700">✓ Disponible</span>
+          <span class="font-mono font-bold text-xs bg-[#0c0e12] text-white px-2.5 py-1 rounded-md border border-white/10">${time} hs</span>
+          <span class="text-xs font-semibold text-emerald-400">✓ Disponible</span>
         </div>
-        <button onclick="adminToggleSlot('${adminSelectedDate}', '${time}', false)" class="px-3.5 py-1.5 text-xs font-bold bg-slate-50 hover:bg-red-50 text-slate-700 hover:text-red-600 border border-slate-300 hover:border-red-300 rounded-xl transition flex items-center gap-1 flex-shrink-0 shadow-xs">
+        <button onclick="adminToggleSlot('${adminSelectedDate}', '${time}', false)" class="px-3.5 py-1.5 text-xs font-bold bg-white/5 hover:bg-red-950/40 text-slate-300 hover:text-red-300 border border-white/10 hover:border-red-800/40 rounded-xl transition flex items-center gap-1 flex-shrink-0 shadow-xs">
           <i data-lucide="ban" class="w-3.5 h-3.5"></i>
           <span>Eliminar Horario</span>
         </button>
@@ -1517,11 +1517,11 @@ function renderAdminScheduleSlots() {
       <!-- BLOQUE MAÑANA -->
       <div class="space-y-2">
         <div class="flex items-center justify-between px-1">
-          <span class="text-xs font-extrabold text-slate-900 flex items-center gap-1.5">
+          <span class="text-xs font-extrabold text-white flex items-center gap-1.5">
             <span>☀️</span>
             <span>Turno Mañana (09:00 a 12:30 hs)</span>
           </span>
-          <button onclick="adminToggleShiftSlots('morning', ${!isAllMorningDisabled})" class="px-2.5 py-1 ${isAllMorningDisabled ? 'bg-emerald-50 hover:bg-emerald-100 text-emerald-700 border-emerald-300' : 'bg-red-50 hover:bg-red-100 text-red-700 border-red-200'} border rounded-lg text-[11px] font-bold transition flex items-center gap-1 shadow-xs" title="${isAllMorningDisabled ? 'Volver a habilitar todos los turnos de la mañana' : 'Deshabilitar todos los turnos de la mañana'}">
+          <button onclick="adminToggleShiftSlots('morning', ${!isAllMorningDisabled})" class="px-2.5 py-1 ${isAllMorningDisabled ? 'bg-emerald-950/50 hover:bg-emerald-900/60 text-emerald-300 border-emerald-700/50' : 'bg-red-950/40 hover:bg-red-900/50 text-red-300 border-red-800/40'} border rounded-lg text-[11px] font-bold transition flex items-center gap-1 shadow-xs" title="${isAllMorningDisabled ? 'Volver a habilitar todos los turnos de la mañana' : 'Deshabilitar todos los turnos de la mañana'}">
             <i data-lucide="${isAllMorningDisabled ? 'check' : 'ban'}" class="w-3 h-3"></i>
             <span>${isAllMorningDisabled ? 'Habilitar Mañana' : 'Eliminar toda la Mañana'}</span>
           </button>
@@ -1534,11 +1534,11 @@ function renderAdminScheduleSlots() {
       <!-- BLOQUE TARDE -->
       <div class="space-y-2 pt-2">
         <div class="flex items-center justify-between px-1">
-          <span class="text-xs font-extrabold text-slate-900 flex items-center gap-1.5">
+          <span class="text-xs font-extrabold text-white flex items-center gap-1.5">
             <span>🌙</span>
             <span>Turno Tarde (16:30 a 20:00 hs)</span>
           </span>
-          <button onclick="adminToggleShiftSlots('afternoon', ${!isAllAfternoonDisabled})" class="px-2.5 py-1 ${isAllAfternoonDisabled ? 'bg-emerald-50 hover:bg-emerald-100 text-emerald-700 border-emerald-300' : 'bg-red-50 hover:bg-red-100 text-red-700 border-red-200'} border rounded-lg text-[11px] font-bold transition flex items-center gap-1 shadow-xs" title="${isAllAfternoonDisabled ? 'Volver a habilitar todos los turnos de la tarde' : 'Deshabilitar todos los turnos de la tarde'}">
+          <button onclick="adminToggleShiftSlots('afternoon', ${!isAllAfternoonDisabled})" class="px-2.5 py-1 ${isAllAfternoonDisabled ? 'bg-emerald-950/50 hover:bg-emerald-900/60 text-emerald-300 border-emerald-700/50' : 'bg-red-950/40 hover:bg-red-900/50 text-red-300 border-red-800/40'} border rounded-lg text-[11px] font-bold transition flex items-center gap-1 shadow-xs" title="${isAllAfternoonDisabled ? 'Volver a habilitar todos los turnos de la tarde' : 'Deshabilitar todos los turnos de la tarde'}">
             <i data-lucide="${isAllAfternoonDisabled ? 'check' : 'ban'}" class="w-3 h-3"></i>
             <span>${isAllAfternoonDisabled ? 'Habilitar Tarde' : 'Eliminar toda la Tarde'}</span>
           </button>

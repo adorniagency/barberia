@@ -15,32 +15,32 @@
   <!-- Custom CSS -->
   <link rel="stylesheet" href="styles.css">
 </head>
-<body class="bg-slate-50 text-slate-900 antialiased min-h-screen flex flex-col justify-between">
+<body class="bg-[#0c0e12] text-slate-100 antialiased min-h-screen flex flex-col justify-between selection:bg-amber-500 selection:text-slate-950">
 
-  <!-- Header Limpio -->
-  <header class="bg-white border-b border-slate-200 sticky top-0 z-30 shadow-xs">
+  <!-- Header Limpio y Oscuro -->
+  <header class="bg-[#13161d]/90 backdrop-blur-md border-b border-white/10 sticky top-0 z-30 shadow-md">
     <div class="max-w-xl mx-auto px-4 py-3 flex items-center justify-between">
       
-      <a href="#" onclick="showWelcomeScreen(); return false;" class="flex items-center gap-2.5">
-        <div class="w-9 h-9 rounded-xl bg-amber-500 text-slate-950 flex items-center justify-center font-bold">
-          <i data-lucide="scissors" class="w-5 h-5"></i>
+      <a href="#" onclick="showWelcomeScreen(); return false;" class="flex items-center gap-2.5 group">
+        <div class="w-9 h-9 rounded-xl bg-gradient-to-br from-amber-400 to-amber-600 text-slate-950 flex items-center justify-center font-bold shadow-md shadow-amber-500/20 group-hover:scale-105 transition">
+          <i data-lucide="scissors" class="w-5 h-5 stroke-[2.5]"></i>
         </div>
         <div>
-          <span class="font-serif-title text-lg font-extrabold tracking-tight text-slate-950 block leading-tight">BARBERÍA PACO</span>
-          <span class="text-[10px] text-slate-500 font-medium">Esperanza (SF)</span>
+          <span class="font-serif-title text-lg font-extrabold tracking-tight text-white block leading-tight">BARBERÍA PACO</span>
+          <span class="text-[10px] text-amber-400/90 font-medium tracking-wide">Esperanza (SF)</span>
         </div>
       </a>
 
       <div class="flex items-center gap-2">
         <!-- Botón Mis Turnos (Cliente) -->
-        <button onclick="openMyAppointmentsModal()" class="px-2.5 py-1 rounded-lg bg-white hover:bg-slate-100 text-slate-700 hover:text-slate-950 text-[11px] font-semibold border border-slate-300 transition flex items-center gap-1.5 shadow-xs" title="Ver mis turnos agendados">
-          <i data-lucide="calendar-check" class="w-3 h-3 text-amber-600"></i>
+        <button onclick="openMyAppointmentsModal()" class="px-2.5 py-1.5 rounded-lg bg-white/5 hover:bg-white/10 text-slate-200 hover:text-white text-[11px] font-semibold border border-white/10 hover:border-amber-400/40 transition flex items-center gap-1.5 shadow-xs" title="Ver mis turnos agendados">
+          <i data-lucide="calendar-check" class="w-3.5 h-3.5 text-amber-400"></i>
           <span>Mis Turnos</span>
         </button>
 
-        <!-- Botón de acceso exclusivo para el Barbero (Arriba a la derecha - tamaño chico) -->
-        <button onclick="handleAdminClick()" class="px-2.5 py-1 rounded-lg bg-slate-100 hover:bg-slate-200 text-slate-600 hover:text-slate-900 text-[11px] font-semibold border border-slate-300 transition flex items-center gap-1.5 shadow-xs" title="Acceso exclusivo barbero">
-          <i data-lucide="lock" class="w-3 h-3 text-amber-600"></i>
+        <!-- Botón de acceso exclusivo para el Barbero -->
+        <button onclick="handleAdminClick()" class="px-2.5 py-1.5 rounded-lg bg-white/5 hover:bg-white/10 text-slate-300 hover:text-white text-[11px] font-semibold border border-white/10 hover:border-amber-400/40 transition flex items-center gap-1.5 shadow-xs" title="Acceso exclusivo barbero">
+          <i data-lucide="lock" class="w-3.5 h-3.5 text-amber-400"></i>
           <span>Acceso Barbero</span>
         </button>
       </div>
@@ -56,33 +56,33 @@
     <!-- ---------------------------------------------------- -->
     <div id="welcomeScreen" class="text-center py-10 sm:py-14 space-y-8 animate-fade-in">
       
-      <div class="w-24 h-24 rounded-3xl bg-amber-500 text-slate-950 flex items-center justify-center mx-auto shadow-xl shadow-amber-500/20">
-        <i data-lucide="scissors" class="w-12 h-12"></i>
+      <div class="w-24 h-24 rounded-3xl bg-gradient-to-br from-amber-400 via-amber-500 to-amber-600 text-slate-950 flex items-center justify-center mx-auto shadow-2xl shadow-amber-500/30 ring-4 ring-amber-500/20">
+        <i data-lucide="scissors" class="w-12 h-12 stroke-[2.2]"></i>
       </div>
 
       <div class="space-y-2">
-        <h1 class="text-3xl sm:text-4xl font-extrabold text-slate-950 font-serif-title tracking-tight">
+        <h1 class="text-3xl sm:text-4xl font-extrabold text-white font-serif-title tracking-tight">
           Barbería Paco
         </h1>
-        <p class="text-base text-slate-600 font-medium">
+        <p class="text-base text-slate-400 font-medium">
           Belgrano 1450 • Esperanza, Santa Fe
         </p>
       </div>
 
       <!-- BOTONES DE ACCIÓN: PEDIR TURNO Y VER MIS TURNOS -->
       <div class="max-w-xs mx-auto pt-4 space-y-3">
-        <button onclick="startBookingFlow()" class="w-full py-5 px-6 bg-slate-950 hover:bg-slate-800 text-white font-extrabold text-lg sm:text-xl rounded-2xl shadow-xl shadow-slate-950/20 transition-all active:scale-95 flex items-center justify-center gap-3">
-          <i data-lucide="calendar-plus" class="w-6 h-6 text-amber-400"></i>
+        <button onclick="startBookingFlow()" class="w-full py-5 px-6 bg-gradient-to-r from-amber-400 via-amber-500 to-amber-600 hover:brightness-110 text-slate-950 font-black text-lg sm:text-xl rounded-2xl shadow-xl shadow-amber-500/25 transition-all active:scale-95 flex items-center justify-center gap-3">
+          <i data-lucide="calendar-plus" class="w-6 h-6 stroke-[2.5]"></i>
           <span>PEDIR TURNO</span>
         </button>
 
-        <button onclick="openMyAppointmentsModal()" class="w-full py-3.5 px-4 bg-white hover:bg-slate-100 text-slate-800 hover:text-slate-950 font-bold text-sm rounded-2xl border-2 border-slate-200 hover:border-slate-300 shadow-sm transition-all active:scale-95 flex items-center justify-center gap-2">
-          <i data-lucide="calendar-check" class="w-4 h-4 text-amber-600"></i>
+        <button onclick="openMyAppointmentsModal()" class="w-full py-3.5 px-4 bg-[#161920] hover:bg-[#20242e] text-slate-200 hover:text-white font-bold text-sm rounded-2xl border border-white/10 hover:border-amber-400/40 shadow-sm transition-all active:scale-95 flex items-center justify-center gap-2">
+          <i data-lucide="calendar-check" class="w-4 h-4 text-amber-400"></i>
           <span>Ver Mis Turnos</span>
         </button>
       </div>
 
-      <p class="text-xs text-slate-400">Turnos rápidos en 3 pasos</p>
+      <p class="text-xs text-slate-500">Turnos rápidos en 3 pasos</p>
     </div>
 
     <!-- ---------------------------------------------------- -->
@@ -90,15 +90,15 @@
     <!-- ---------------------------------------------------- -->
     <div id="bookingFlowContainer" class="hidden animate-fade-in">
 
-      <div class="bg-white rounded-3xl p-4 sm:p-6 border border-slate-200 card-shadow space-y-4 sm:space-y-5">
+      <div class="bg-[#15181e] rounded-3xl p-4 sm:p-6 border border-white/10 card-shadow space-y-4 sm:space-y-5 text-white">
 
         <!-- Barra superior con botón volver y paso actual -->
-        <div class="flex items-center justify-between pb-3 border-b border-slate-100">
-          <button id="btnBackStep" onclick="goToPreviousStep()" class="text-xs font-bold text-slate-600 hover:text-slate-900 flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg bg-slate-100 hover:bg-slate-200 transition">
+        <div class="flex items-center justify-between pb-3 border-b border-white/10">
+          <button id="btnBackStep" onclick="goToPreviousStep()" class="text-xs font-bold text-slate-300 hover:text-white flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-white/5 hover:bg-white/10 border border-white/10 transition">
             <i data-lucide="arrow-left" class="w-4 h-4"></i>
             <span>Volver</span>
           </button>
-          <span id="stepCounterLabel" class="text-xs font-bold text-amber-700 uppercase tracking-wider">
+          <span id="stepCounterLabel" class="text-xs font-bold text-amber-400 uppercase tracking-wider">
             Paso 1 de 3
           </span>
         </div>
@@ -106,8 +106,8 @@
         <!-- PASO 1: ELEGIR SERVICIO -->
         <div id="stepServicesSection" class="space-y-4">
           <div class="text-left">
-            <h2 class="text-lg sm:text-xl font-extrabold text-slate-950">¿Qué te vas a hacer?</h2>
-            <p class="text-xs text-slate-500">Tocá una de las opciones:</p>
+            <h2 class="text-lg sm:text-xl font-extrabold text-white">¿Qué te vas a hacer?</h2>
+            <p class="text-xs text-slate-400">Tocá una de las opciones:</p>
           </div>
           <div id="servicesListSimple" class="space-y-3">
             <!-- Inyectado dinámicamente -->
@@ -117,16 +117,16 @@
         <!-- PASO 2: ELEGIR DÍA (CALENDARIO VISUAL) Y HORA -->
         <div id="stepDateTimeSection" class="space-y-3.5 hidden">
           <div class="text-left">
-            <h2 class="text-lg sm:text-xl font-extrabold text-slate-950 font-serif-title">Elegí un día</h2>
-            <p class="text-xs text-slate-500">Seleccioná una fecha disponible en el calendario:</p>
+            <h2 class="text-lg sm:text-xl font-extrabold text-white font-serif-title">Elegí un día</h2>
+            <p class="text-xs text-slate-400">Seleccioná una fecha disponible en el calendario:</p>
           </div>
 
-          <!-- CALENDARIO VISUAL (SUBIDO Y COMPACTO PARA VERSE PERFECTO) -->
-          <div class="bg-[#0c0b0e] text-stone-100 rounded-2xl sm:rounded-3xl p-3.5 sm:p-5 border border-stone-800 shadow-xl">
+          <!-- CALENDARIO VISUAL -->
+          <div class="bg-[#0c0e12] text-stone-100 rounded-2xl sm:rounded-3xl p-3.5 sm:p-5 border border-white/10 shadow-xl">
             
             <!-- Encabezado con navegación de Mes -->
             <div class="flex items-center justify-between mb-3 sm:mb-4">
-              <button id="calPrevBtn" onclick="changeCalendarMonth(-1)" class="w-8 h-8 rounded-full bg-stone-900 hover:bg-stone-800 text-stone-300 hover:text-white border border-stone-700 flex items-center justify-center transition disabled:opacity-20 disabled:cursor-not-allowed">
+              <button id="calPrevBtn" onclick="changeCalendarMonth(-1)" class="w-8 h-8 rounded-full bg-white/5 hover:bg-white/10 text-stone-300 hover:text-white border border-white/10 flex items-center justify-center transition disabled:opacity-20 disabled:cursor-not-allowed">
                 <i data-lucide="arrow-left" class="w-4 h-4"></i>
               </button>
               
@@ -134,7 +134,7 @@
                 Septiembre 2026
               </h3>
 
-              <button id="calNextBtn" onclick="changeCalendarMonth(1)" class="w-8 h-8 rounded-full bg-stone-900 hover:bg-stone-800 text-stone-300 hover:text-white border border-stone-700 flex items-center justify-center transition">
+              <button id="calNextBtn" onclick="changeCalendarMonth(1)" class="w-8 h-8 rounded-full bg-white/5 hover:bg-white/10 text-stone-300 hover:text-white border border-white/10 flex items-center justify-center transition">
                 <i data-lucide="arrow-right" class="w-4 h-4"></i>
               </button>
             </div>
@@ -160,12 +160,12 @@
           <!-- Horarios disponibles para el día seleccionado -->
           <div id="slotsForSelectedDayContainer" class="pt-2 scroll-mt-6">
             <div class="flex items-center justify-between mb-3">
-              <p id="selectedDaySlotsTitle" class="text-xs sm:text-sm font-bold text-slate-800">
+              <p id="selectedDaySlotsTitle" class="text-xs sm:text-sm font-bold text-slate-200">
                 Horarios disponibles:
               </p>
               <div class="flex items-center gap-2 text-xs">
-                <span class="flex items-center gap-1 text-emerald-700 font-semibold"><span class="w-2 h-2 rounded-full bg-emerald-500"></span> Libre</span>
-                <span class="flex items-center gap-1 text-red-600 font-semibold"><span class="w-2 h-2 rounded-full bg-red-500"></span> Ocupado</span>
+                <span class="flex items-center gap-1 text-emerald-400 font-semibold"><span class="w-2 h-2 rounded-full bg-emerald-500"></span> Libre</span>
+                <span class="flex items-center gap-1 text-red-400 font-semibold"><span class="w-2 h-2 rounded-full bg-red-500"></span> Ocupado</span>
               </div>
             </div>
             <div id="timesGridSimple" class="space-y-4">
@@ -178,18 +178,18 @@
         <!-- PASO 3: TUS DATOS Y CONFIRMACIÓN -->
         <div id="stepCustomerSection" class="space-y-4 hidden">
           <div class="text-left">
-            <h2 class="text-lg sm:text-xl font-extrabold text-slate-950">Tus datos para el turno:</h2>
-            <p class="text-xs text-slate-500">Para guardarte el horario a tu nombre:</p>
+            <h2 class="text-lg sm:text-xl font-extrabold text-white">Tus datos para el turno:</h2>
+            <p class="text-xs text-slate-400">Para guardarte el horario a tu nombre:</p>
           </div>
 
           <div class="space-y-3">
             <div>
-              <label for="simpleClientName" class="block text-xs font-bold text-slate-700 mb-1">Nombre y Apellido: *</label>
-              <input id="simpleClientName" type="text" placeholder="Ej: Juan Pérez" class="w-full bg-slate-50 border border-slate-300 rounded-xl px-4 py-3.5 text-sm font-medium text-slate-900 focus:bg-white focus:border-amber-500 focus:outline-none">
+              <label for="simpleClientName" class="block text-xs font-bold text-slate-300 mb-1">Nombre y Apellido: *</label>
+              <input id="simpleClientName" type="text" placeholder="Ej: Juan Pérez" class="w-full bg-[#0c0e12] border border-white/15 rounded-xl px-4 py-3.5 text-sm font-medium text-white placeholder-slate-500 focus:bg-[#11141a] focus:border-amber-400 focus:outline-none transition">
             </div>
 
             <div>
-              <label for="simpleClientPhone" class="block text-xs font-bold text-slate-700 mb-1">Número de Celular / WhatsApp: * <span class="text-slate-400 font-normal">(solo números)</span></label>
+              <label for="simpleClientPhone" class="block text-xs font-bold text-slate-300 mb-1">Número de Celular / WhatsApp: * <span class="text-slate-500 font-normal">(solo números)</span></label>
               <!-- RESTRICCIÓN ESTRICTA: SOLO PERMITE ESCRIBIR NÚMEROS -->
               <input id="simpleClientPhone" 
                      type="tel" 
@@ -197,27 +197,27 @@
                      pattern="[0-9]*" 
                      placeholder="Ej: 3496512344" 
                      oninput="this.value = this.value.replace(/[^0-9]/g, '')" 
-                     class="w-full bg-slate-50 border border-slate-300 rounded-xl px-4 py-3.5 text-sm font-mono font-medium text-slate-900 focus:bg-white focus:border-amber-500 focus:outline-none">
-              <span class="text-[11px] text-slate-400 block mt-1">Escribí tu número sin letras ni símbolos (ej: 3496512344)</span>
+                     class="w-full bg-[#0c0e12] border border-white/15 rounded-xl px-4 py-3.5 text-sm font-mono font-medium text-white placeholder-slate-500 focus:bg-[#11141a] focus:border-amber-400 focus:outline-none transition">
+              <span class="text-[11px] text-slate-500 block mt-1">Escribí tu número sin letras ni símbolos (ej: 3496512344)</span>
             </div>
 
             <div>
-              <label for="simpleClientNotes" class="block text-xs font-bold text-slate-700 mb-1">Aclaraciones: <span class="text-slate-400 font-normal">(opcional)</span></label>
+              <label for="simpleClientNotes" class="block text-xs font-bold text-slate-300 mb-1">Aclaraciones: <span class="text-slate-500 font-normal">(opcional)</span></label>
               <textarea id="simpleClientNotes" 
                         rows="2" 
                         placeholder="Ej: Degradé bajo en los costados, voy con mi hijo, etc." 
-                        class="w-full bg-slate-50 border border-slate-300 rounded-xl px-4 py-3 text-sm font-medium text-slate-900 focus:bg-white focus:border-amber-500 focus:outline-none resize-none"></textarea>
-              <span class="text-[11px] text-slate-400 block mt-0.5">Indicá cualquier preferencia o detalle para el barbero</span>
+                        class="w-full bg-[#0c0e12] border border-white/15 rounded-xl px-4 py-3 text-sm font-medium text-white placeholder-slate-500 focus:bg-[#11141a] focus:border-amber-400 focus:outline-none resize-none transition"></textarea>
+              <span class="text-[11px] text-slate-500 block mt-0.5">Indicá cualquier preferencia o detalle para el barbero</span>
             </div>
           </div>
 
           <!-- Resumen -->
-          <div id="simpleBookingSummary" class="p-4 bg-amber-50 border border-amber-200 rounded-xl text-xs sm:text-sm text-slate-800">
+          <div id="simpleBookingSummary" class="p-4 bg-[#11141a] border border-amber-500/30 rounded-xl text-xs sm:text-sm text-slate-200">
             <!-- Inyectado dinámicamente -->
           </div>
 
-          <button onclick="confirmSimpleBooking()" class="w-full py-4 px-6 bg-slate-950 hover:bg-slate-800 text-white font-extrabold text-base rounded-2xl shadow-lg transition active:scale-98 flex items-center justify-center gap-2">
-            <i data-lucide="check-circle" class="w-5 h-5 text-amber-400"></i>
+          <button onclick="confirmSimpleBooking()" class="w-full py-4 px-6 bg-gradient-to-r from-amber-400 via-amber-500 to-amber-600 hover:brightness-110 text-slate-950 font-extrabold text-base rounded-2xl shadow-xl shadow-amber-500/25 transition active:scale-98 flex items-center justify-center gap-2">
+            <i data-lucide="check-circle" class="w-5 h-5 stroke-[2.5]"></i>
             <span>CONFIRMAR TURNO</span>
           </button>
         </div>
@@ -229,24 +229,24 @@
   </main>
 
   <!-- Modal de Confirmación Exitosa -->
-  <div id="successModalSimple" class="fixed inset-0 z-50 bg-slate-900/80 backdrop-blur-sm hidden flex items-center justify-center p-4">
-    <div class="bg-white rounded-3xl p-6 sm:p-8 max-w-md w-full border border-slate-200 shadow-2xl text-center animate-fade-in">
-      <div class="w-14 h-14 rounded-full bg-emerald-100 text-emerald-600 flex items-center justify-center mx-auto mb-3">
+  <div id="successModalSimple" class="fixed inset-0 z-50 bg-black/85 backdrop-blur-md hidden flex items-center justify-center p-4">
+    <div class="bg-[#15181e] rounded-3xl p-6 sm:p-8 max-w-md w-full border border-white/10 shadow-2xl text-center animate-fade-in text-white">
+      <div class="w-14 h-14 rounded-full bg-emerald-500/20 text-emerald-400 flex items-center justify-center mx-auto mb-3">
         <i data-lucide="check" class="w-7 h-7 stroke-[3]"></i>
       </div>
-      <span class="text-xs font-bold text-emerald-700 uppercase tracking-widest block mb-1">¡Listo!</span>
-      <h3 class="text-2xl font-extrabold text-slate-950 font-serif-title mb-2">Turno Confirmado</h3>
+      <span class="text-xs font-bold text-emerald-400 uppercase tracking-widest block mb-1">¡Listo!</span>
+      <h3 class="text-2xl font-extrabold text-white font-serif-title mb-2">Turno Confirmado</h3>
       
-      <div id="successDetailsCard" class="my-4 p-4 bg-slate-50 border border-slate-200 rounded-xl text-left space-y-2 text-xs sm:text-sm">
+      <div id="successDetailsCard" class="my-4 p-4 bg-[#0c0e12] border border-white/10 rounded-xl text-left space-y-2 text-xs sm:text-sm text-slate-300">
         <!-- Inyectado por app.js -->
       </div>
 
       <div class="pt-3 space-y-2">
-        <button onclick="closeSuccessModalAndOpenMyTurnos()" class="w-full py-3.5 px-4 bg-amber-500 hover:bg-amber-600 text-slate-950 font-extrabold text-sm rounded-xl shadow-md transition flex items-center justify-center gap-2">
+        <button onclick="closeSuccessModalAndOpenMyTurnos()" class="w-full py-3.5 px-4 bg-gradient-to-r from-amber-400 via-amber-500 to-amber-600 hover:brightness-110 text-slate-950 font-extrabold text-sm rounded-xl shadow-lg shadow-amber-500/20 transition flex items-center justify-center gap-2">
           <i data-lucide="calendar-check" class="w-4 h-4"></i>
           <span>Ver en Mis Turnos</span>
         </button>
-        <button onclick="closeSuccessModal()" class="w-full py-2.5 px-4 bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold text-xs rounded-xl transition flex items-center justify-center gap-2">
+        <button onclick="closeSuccessModal()" class="w-full py-2.5 px-4 bg-white/5 hover:bg-white/10 text-slate-300 hover:text-white font-bold text-xs rounded-xl border border-white/10 transition flex items-center justify-center gap-2">
           <span>Volver al Inicio</span>
         </button>
       </div>
@@ -254,90 +254,90 @@
   </div>
 
   <!-- Modal de Login Barbero -->
-  <div id="adminLoginModal" class="fixed inset-0 z-50 bg-slate-900/80 backdrop-blur-sm hidden flex items-center justify-center p-4">
-    <div class="bg-white rounded-3xl p-6 sm:p-7 max-w-sm w-full border border-slate-200 shadow-2xl text-center animate-fade-in">
-      <div class="w-12 h-12 rounded-2xl bg-amber-500/20 text-amber-600 flex items-center justify-center mx-auto mb-3">
+  <div id="adminLoginModal" class="fixed inset-0 z-50 bg-black/85 backdrop-blur-md hidden flex items-center justify-center p-4">
+    <div class="bg-[#15181e] rounded-3xl p-6 sm:p-7 max-w-sm w-full border border-white/10 shadow-2xl text-center animate-fade-in text-white">
+      <div class="w-12 h-12 rounded-2xl bg-amber-500/20 text-amber-400 flex items-center justify-center mx-auto mb-3">
         <i data-lucide="shield-check" class="w-6 h-6"></i>
       </div>
-      <h3 class="text-xl font-bold text-slate-950">Acceso Exclusivo Barbero</h3>
-      <p class="text-xs text-slate-500 mt-1 mb-4">Ingresá tu clave de seguridad para administrar turnos y horarios:</p>
+      <h3 class="text-xl font-bold text-white">Acceso Exclusivo Barbero</h3>
+      <p class="text-xs text-slate-400 mt-1 mb-4">Ingresá tu clave de seguridad para administrar turnos y horarios:</p>
 
       <form onsubmit="verifyAdminPin(event)" class="space-y-3">
-        <input id="adminPinInput" type="password" placeholder="Ingresá la clave (ej: 1234)" class="w-full text-center tracking-widest bg-slate-50 border-2 border-slate-300 rounded-xl px-4 py-3 text-base font-bold text-slate-900 focus:border-amber-500 focus:bg-white focus:outline-none">
-        <p id="adminLoginError" class="text-xs text-red-600 font-semibold hidden">Clave incorrecta. Intentá de nuevo.</p>
+        <input id="adminPinInput" type="password" placeholder="Ingresá la clave (ej: 1234)" class="w-full text-center tracking-widest bg-[#0c0e12] border-2 border-white/15 rounded-xl px-4 py-3 text-base font-bold text-white placeholder-slate-500 focus:border-amber-400 focus:bg-[#11141a] focus:outline-none transition">
+        <p id="adminLoginError" class="text-xs text-red-400 font-semibold hidden">Clave incorrecta. Intentá de nuevo.</p>
 
         <div class="flex gap-2 pt-1">
-          <button type="button" onclick="closeAdminLoginModal()" class="w-1/2 py-2.5 bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold text-xs rounded-xl transition">
+          <button type="button" onclick="closeAdminLoginModal()" class="w-1/2 py-2.5 bg-white/5 hover:bg-white/10 text-slate-300 font-bold text-xs rounded-xl border border-white/10 transition">
             Cancelar
           </button>
-          <button type="submit" class="w-1/2 py-2.5 bg-slate-950 hover:bg-slate-800 text-white font-bold text-xs rounded-xl transition">
+          <button type="submit" class="w-1/2 py-2.5 bg-gradient-to-r from-amber-400 to-amber-500 hover:brightness-110 text-slate-950 font-extrabold text-xs rounded-xl shadow-md transition">
             Ingresar
           </button>
         </div>
       </form>
-      <p class="text-[11px] text-slate-400 mt-3">Clave por defecto: <strong class="text-slate-600">1234</strong></p>
+      <p class="text-[11px] text-slate-500 mt-3">Clave por defecto: <strong class="text-slate-300">1234</strong></p>
     </div>
   </div>
 
   <!-- Panel Principal del Barbero con Calendario Desplegable y Espacioso para Turnos -->
-  <div id="adminModal" class="fixed inset-0 z-50 bg-slate-900/80 backdrop-blur-sm hidden flex items-center justify-center p-2 sm:p-4">
-    <div class="w-full max-w-2xl sm:max-w-3xl bg-white border border-slate-200 rounded-3xl shadow-2xl flex flex-col h-[95vh] overflow-hidden animate-fade-in">
+  <div id="adminModal" class="fixed inset-0 z-50 bg-black/85 backdrop-blur-md hidden flex items-center justify-center p-2 sm:p-4">
+    <div class="w-full max-w-2xl sm:max-w-3xl bg-[#15181e] border border-white/10 rounded-3xl shadow-2xl flex flex-col h-[95vh] overflow-hidden animate-fade-in text-white">
       
       <!-- Header del Panel -->
-      <div class="p-3 sm:p-4 border-b border-slate-200 flex items-center justify-between bg-slate-950 text-white flex-shrink-0">
+      <div class="p-3 sm:p-4 border-b border-white/10 flex items-center justify-between bg-[#0c0e12] text-white flex-shrink-0">
         <div class="flex items-center gap-2.5">
-          <div class="w-9 h-9 rounded-xl bg-amber-500 text-slate-950 flex items-center justify-center font-bold shadow-sm">
-            <i data-lucide="scissors" class="w-4 h-4"></i>
+          <div class="w-9 h-9 rounded-xl bg-gradient-to-br from-amber-400 to-amber-600 text-slate-950 flex items-center justify-center font-bold shadow-sm">
+            <i data-lucide="scissors" class="w-4 h-4 stroke-[2.5]"></i>
           </div>
           <div>
-            <h3 class="font-bold text-sm sm:text-base leading-tight">Panel de Barbería Paco</h3>
-            <p class="text-[11px] text-amber-300 font-medium">Gestión de Turnos & Horarios</p>
+            <h3 class="font-bold text-sm sm:text-base leading-tight text-white">Panel de Barbería Paco</h3>
+            <p class="text-[11px] text-amber-400 font-medium">Gestión de Turnos & Horarios</p>
           </div>
         </div>
         <div class="flex items-center gap-2">
-          <button onclick="logoutAdmin()" class="px-3 py-1.5 text-xs font-bold text-slate-300 hover:text-white bg-slate-800 hover:bg-slate-700 rounded-lg flex items-center gap-1.5 transition">
+          <button onclick="logoutAdmin()" class="px-3 py-1.5 text-xs font-bold text-slate-300 hover:text-white bg-white/5 hover:bg-white/10 border border-white/10 rounded-lg flex items-center gap-1.5 transition">
             <i data-lucide="log-out" class="w-3.5 h-3.5"></i>
             <span>Cerrar sesión</span>
           </button>
-          <button onclick="closeAdminModal()" class="w-8 h-8 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-300 hover:text-white flex items-center justify-center transition" title="Cerrar panel">
+          <button onclick="closeAdminModal()" class="w-8 h-8 rounded-lg bg-white/5 hover:bg-white/10 text-slate-300 hover:text-white border border-white/10 flex items-center justify-center transition" title="Cerrar panel">
             <i data-lucide="x" class="w-4 h-4"></i>
           </button>
         </div>
       </div>
 
       <!-- Barra de Fecha Seleccionada y Controles rápidos -->
-      <div class="p-2.5 sm:p-3 px-4 bg-slate-100 border-b border-slate-200 flex flex-wrap items-center justify-between gap-2 text-xs sm:text-sm flex-shrink-0">
+      <div class="p-2.5 sm:p-3 px-4 bg-[#11141a] border-b border-white/10 flex flex-wrap items-center justify-between gap-2 text-xs sm:text-sm flex-shrink-0 text-slate-300">
         <div class="flex items-center gap-2">
-          <button onclick="changeAdminDayOffset(-1)" title="Día anterior" class="w-8 h-8 rounded-lg bg-white hover:bg-slate-200 text-slate-700 border border-slate-300 flex items-center justify-center transition shadow-xs">
+          <button onclick="changeAdminDayOffset(-1)" title="Día anterior" class="w-8 h-8 rounded-lg bg-white/5 hover:bg-white/10 text-slate-200 border border-white/10 flex items-center justify-center transition shadow-xs">
             <i data-lucide="chevron-left" class="w-4 h-4"></i>
           </button>
           <div class="flex items-center gap-1.5">
-            <span class="text-slate-500 font-medium hidden sm:inline">Viendo:</span>
-            <strong id="adminCurrentDayLabel" class="text-slate-950 font-extrabold text-xs sm:text-sm">Hoy</strong>
+            <span class="text-slate-400 font-medium hidden sm:inline">Viendo:</span>
+            <strong id="adminCurrentDayLabel" class="text-white font-extrabold text-xs sm:text-sm">Hoy</strong>
           </div>
-          <button onclick="changeAdminDayOffset(1)" title="Día siguiente" class="w-8 h-8 rounded-lg bg-white hover:bg-slate-200 text-slate-700 border border-slate-300 flex items-center justify-center transition shadow-xs">
+          <button onclick="changeAdminDayOffset(1)" title="Día siguiente" class="w-8 h-8 rounded-lg bg-white/5 hover:bg-white/10 text-slate-200 border border-white/10 flex items-center justify-center transition shadow-xs">
             <i data-lucide="chevron-right" class="w-4 h-4"></i>
           </button>
         </div>
 
         <div class="flex items-center gap-2">
-          <button onclick="adminGoToToday()" class="px-2.5 py-1.5 bg-white hover:bg-slate-200 text-slate-800 text-xs font-bold rounded-lg border border-slate-300 transition shadow-xs">
+          <button onclick="adminGoToToday()" class="px-2.5 py-1.5 bg-white/5 hover:bg-white/10 text-slate-200 text-xs font-bold rounded-lg border border-white/10 transition shadow-xs">
             Hoy
           </button>
-          <button id="toggleAdminCalBtn" onclick="toggleAdminCalendar()" class="px-3 py-1.5 bg-amber-500 hover:bg-amber-600 text-slate-950 text-xs font-extrabold rounded-lg transition flex items-center gap-1.5 shadow-xs">
+          <button id="toggleAdminCalBtn" onclick="toggleAdminCalendar()" class="px-3 py-1.5 bg-gradient-to-r from-amber-400 to-amber-500 hover:brightness-110 text-slate-950 text-xs font-extrabold rounded-lg transition flex items-center gap-1.5 shadow-xs">
             <i data-lucide="calendar" class="w-3.5 h-3.5"></i>
             <span id="toggleAdminCalBtnText">Ver Calendario</span>
           </button>
-          <span class="px-2.5 py-1.5 bg-slate-200 text-slate-800 rounded-lg text-xs font-bold">
-            Turnos: <strong id="adminTotalTurnosCount" class="font-extrabold text-slate-950">0</strong>
+          <span class="px-2.5 py-1.5 bg-white/10 text-slate-200 rounded-lg text-xs font-bold border border-white/5">
+            Turnos: <strong id="adminTotalTurnosCount" class="font-extrabold text-amber-400">0</strong>
           </span>
         </div>
       </div>
 
       <!-- CALENDARIO (DESPLEGABLE / COLAPSABLE PARA NO OCUPAR ESPACIO DE TURNOS) -->
-      <div id="adminCalendarWrapper" class="px-3.5 py-2.5 border-b border-stone-800 bg-[#0c0b0e] text-stone-100 flex-shrink-0 hidden transition-all">
+      <div id="adminCalendarWrapper" class="px-3.5 py-2.5 border-b border-white/10 bg-[#0c0e12] text-stone-100 flex-shrink-0 hidden transition-all">
         <div class="flex items-center justify-between mb-2">
-          <button onclick="changeAdminCalendarMonth(-1)" class="w-7 h-7 rounded-full bg-stone-900 hover:bg-stone-800 text-stone-300 hover:text-white border border-stone-700 flex items-center justify-center transition">
+          <button onclick="changeAdminCalendarMonth(-1)" class="w-7 h-7 rounded-full bg-white/5 hover:bg-white/10 text-stone-300 hover:text-white border border-white/10 flex items-center justify-center transition">
             <i data-lucide="arrow-left" class="w-3.5 h-3.5"></i>
           </button>
           
@@ -345,7 +345,7 @@
             Septiembre 2026
           </h4>
 
-          <button onclick="changeAdminCalendarMonth(1)" class="w-7 h-7 rounded-full bg-stone-900 hover:bg-stone-800 text-stone-300 hover:text-white border border-stone-700 flex items-center justify-center transition">
+          <button onclick="changeAdminCalendarMonth(1)" class="w-7 h-7 rounded-full bg-white/5 hover:bg-white/10 text-stone-300 hover:text-white border border-white/10 flex items-center justify-center transition">
             <i data-lucide="arrow-right" class="w-3.5 h-3.5"></i>
           </button>
         </div>
@@ -368,20 +368,20 @@
       </div>
 
       <!-- Pestañas: Cortes Agendados vs Eliminar/Gestionar Horarios -->
-      <div class="flex border-b border-slate-200 bg-white flex-shrink-0 text-xs sm:text-sm font-bold">
-        <button id="tabBtnCortes" onclick="adminSwitchTab('cortes')" class="flex-1 py-3 border-b-2 border-slate-950 text-slate-950 flex items-center justify-center gap-2 transition">
-          <i data-lucide="calendar" class="w-4 h-4 text-amber-600"></i>
+      <div class="flex border-b border-white/10 bg-[#11141a] flex-shrink-0 text-xs sm:text-sm font-bold">
+        <button id="tabBtnCortes" onclick="adminSwitchTab('cortes')" class="flex-1 py-3 border-b-2 border-amber-400 text-amber-400 flex items-center justify-center gap-2 transition">
+          <i data-lucide="calendar" class="w-4 h-4 text-amber-400"></i>
           <span>Cortes Agendados</span>
-          <span id="tabBadgeCortes" class="px-1.5 py-0.5 bg-slate-900 text-white text-[10px] rounded-full font-mono font-bold">0</span>
+          <span id="tabBadgeCortes" class="px-1.5 py-0.5 bg-amber-400 text-slate-950 text-[10px] rounded-full font-mono font-bold">0</span>
         </button>
-        <button id="tabBtnHorarios" onclick="adminSwitchTab('horarios')" class="flex-1 py-3 border-b-2 border-transparent text-slate-500 hover:text-slate-900 flex items-center justify-center gap-2 transition">
+        <button id="tabBtnHorarios" onclick="adminSwitchTab('horarios')" class="flex-1 py-3 border-b-2 border-transparent text-slate-400 hover:text-white flex items-center justify-center gap-2 transition">
           <i data-lucide="clock" class="w-4 h-4"></i>
           <span>Eliminar / Habilitar Horarios</span>
         </button>
       </div>
 
-      <!-- Contenido de las Pestañas (MUCHO más espacioso y cómodo) -->
-      <div id="adminScrollContent" class="flex-1 overflow-y-auto p-4 sm:p-6 space-y-4 min-h-0 bg-slate-50/50">
+      <!-- Contenido de las Pestañas -->
+      <div id="adminScrollContent" class="flex-1 overflow-y-auto p-4 sm:p-6 space-y-4 min-h-0 bg-[#0c0e12]">
         
         <!-- PESTAÑA 1: CORTES AGENDADOS -->
         <div id="adminTabContentCortes" class="space-y-3">
@@ -392,12 +392,12 @@
 
         <!-- PESTAÑA 2: ELIMINAR / GESTIONAR HORARIOS -->
         <div id="adminTabContentHorarios" class="space-y-4 hidden">
-          <div class="p-3.5 bg-amber-50 border border-amber-200 rounded-2xl text-xs sm:text-sm text-slate-700 space-y-1 shadow-xs">
-            <p class="font-bold text-slate-900 flex items-center gap-1.5">
-              <i data-lucide="info" class="w-4 h-4 text-amber-600 flex-shrink-0"></i>
+          <div class="p-3.5 bg-[#171a21] border border-amber-500/30 rounded-2xl text-xs sm:text-sm text-slate-300 space-y-1 shadow-xs">
+            <p class="font-bold text-white flex items-center gap-1.5">
+              <i data-lucide="info" class="w-4 h-4 text-amber-400 flex-shrink-0"></i>
               <span>¿No podés atender a alguna hora o ya agendaste por otro lado?</span>
             </p>
-            <p class="text-xs text-slate-600 leading-relaxed">Tocá <strong>"Eliminar Horario"</strong> para bloquearlo de la web y que ningún cliente lo pueda reservar. Si volvés a estar disponible, podés reactivarlo con <strong>"Habilitar"</strong>.</p>
+            <p class="text-xs text-slate-400 leading-relaxed">Tocá <strong class="text-red-400">"Eliminar Horario"</strong> para bloquearlo de la web y que ningún cliente lo pueda reservar. Si volvés a estar disponible, podés reactivarlo con <strong class="text-emerald-400">"Habilitar"</strong>.</p>
           </div>
 
           <div id="adminScheduleSlotsGrid" class="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
@@ -408,9 +408,9 @@
       </div>
 
       <!-- Footer del Panel -->
-      <div class="p-3 px-4 bg-white border-t border-slate-200 flex items-center justify-between text-xs text-slate-500 flex-shrink-0">
-        <span class="text-[11px] text-slate-400">Barbería Paco • Administración</span>
-        <button onclick="closeAdminModal()" class="px-4 py-1.5 bg-slate-100 hover:bg-slate-200 text-slate-800 text-xs font-bold rounded-lg border border-slate-300 transition">
+      <div class="p-3 px-4 bg-[#11141a] border-t border-white/10 flex items-center justify-between text-xs text-slate-400 flex-shrink-0">
+        <span class="text-[11px] text-slate-500">Barbería Paco • Administración</span>
+        <button onclick="closeAdminModal()" class="px-4 py-1.5 bg-white/5 hover:bg-white/10 text-slate-200 hover:text-white text-xs font-bold rounded-lg border border-white/10 transition">
           Cerrar
         </button>
       </div>
@@ -419,31 +419,31 @@
   </div>
 
   <!-- Modal de Cancelación de Turno con opción de avisar por WhatsApp -->
-  <div id="cancelAppointmentModal" class="fixed inset-0 z-50 bg-slate-900/80 backdrop-blur-sm hidden flex items-center justify-center p-3 sm:p-4">
-    <div class="bg-white rounded-3xl p-5 sm:p-6 max-w-md w-full border border-slate-200 shadow-2xl text-left animate-fade-in space-y-4">
+  <div id="cancelAppointmentModal" class="fixed inset-0 z-50 bg-black/85 backdrop-blur-md hidden flex items-center justify-center p-3 sm:p-4">
+    <div class="bg-[#15181e] rounded-3xl p-5 sm:p-6 max-w-md w-full border border-white/10 shadow-2xl text-left animate-fade-in space-y-4 text-white">
       
       <div class="flex items-center gap-3">
-        <div class="w-11 h-11 rounded-2xl bg-red-100 text-red-600 flex items-center justify-center flex-shrink-0">
+        <div class="w-11 h-11 rounded-2xl bg-red-950/50 border border-red-800/50 text-red-400 flex items-center justify-center flex-shrink-0">
           <i data-lucide="calendar-x" class="w-6 h-6 stroke-[2.5]"></i>
         </div>
         <div>
-          <h3 class="text-lg font-extrabold text-slate-950">Cancelar Turno</h3>
-          <p class="text-xs text-slate-500">¿Estás seguro de cancelar este turno?</p>
+          <h3 class="text-lg font-extrabold text-white">Cancelar Turno</h3>
+          <p class="text-xs text-slate-400">¿Estás seguro de cancelar este turno?</p>
         </div>
       </div>
 
       <!-- Ficha del turno a cancelar -->
-      <div id="cancelModalDetails" class="p-3.5 bg-slate-50 border border-slate-200 rounded-2xl space-y-1.5 text-xs text-slate-700">
+      <div id="cancelModalDetails" class="p-3.5 bg-[#0c0e12] border border-white/10 rounded-2xl space-y-1.5 text-xs text-slate-300">
         <!-- Inyectado dinámicamente -->
       </div>
 
       <!-- Preview del mensaje de WhatsApp -->
-      <div class="p-3 bg-emerald-50 border border-emerald-200 rounded-2xl text-xs text-emerald-950 space-y-1">
-        <div class="flex items-center gap-1.5 font-bold text-emerald-800">
-          <i data-lucide="message-circle" class="w-4 h-4 text-emerald-600"></i>
+      <div class="p-3 bg-emerald-950/30 border border-emerald-500/30 rounded-2xl text-xs text-emerald-200 space-y-1">
+        <div class="flex items-center gap-1.5 font-bold text-emerald-400">
+          <i data-lucide="message-circle" class="w-4 h-4 text-emerald-400"></i>
           <span>Mensaje de aviso por WhatsApp:</span>
         </div>
-        <p id="cancelModalWhatsappPreview" class="text-[11px] text-emerald-900/90 bg-white/80 p-2.5 rounded-xl border border-emerald-200/60 leading-relaxed font-sans">
+        <p id="cancelModalWhatsappPreview" class="text-[11px] text-emerald-100 bg-[#0c0e12]/80 p-2.5 rounded-xl border border-emerald-500/20 leading-relaxed font-sans">
           <!-- Inyectado dinámicamente -->
         </p>
       </div>
@@ -451,19 +451,19 @@
       <!-- Botones de Acción -->
       <div class="space-y-2 pt-1">
         <!-- Botón 1: Cancelar y Avisar por WhatsApp -->
-        <button id="btnConfirmCancelAndNotify" class="w-full py-3 px-4 bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs sm:text-sm rounded-xl shadow-md transition flex items-center justify-center gap-2">
+        <button id="btnConfirmCancelAndNotify" class="w-full py-3 px-4 bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-xs sm:text-sm rounded-xl shadow-md transition flex items-center justify-center gap-2">
           <i data-lucide="message-circle" class="w-4 h-4 stroke-[2.5]"></i>
           <span>Cancelar turno y Avisar por WhatsApp</span>
         </button>
 
         <!-- Botón 2: Cancelar sólo en la web (sin mandar msj) -->
-        <button id="btnConfirmCancelOnly" class="w-full py-2.5 px-4 bg-red-50 hover:bg-red-100 text-red-700 border border-red-200 font-bold text-xs rounded-xl transition flex items-center justify-center gap-1.5">
+        <button id="btnConfirmCancelOnly" class="w-full py-2.5 px-4 bg-red-950/40 hover:bg-red-900/50 text-red-300 border border-red-800/40 font-bold text-xs rounded-xl transition flex items-center justify-center gap-1.5">
           <i data-lucide="trash-2" class="w-3.5 h-3.5"></i>
           <span>Cancelar sólo en la web (Sin avisar)</span>
         </button>
 
         <!-- Botón 3: Cerrar / Volver atrás -->
-        <button type="button" onclick="closeCancelAppointmentModal()" class="w-full py-2 px-4 bg-slate-100 hover:bg-slate-200 text-slate-700 font-semibold text-xs rounded-xl transition text-center">
+        <button type="button" onclick="closeCancelAppointmentModal()" class="w-full py-2 px-4 bg-white/5 hover:bg-white/10 text-slate-300 font-semibold text-xs rounded-xl border border-white/10 transition text-center">
           Volver atrás (No cancelar)
         </button>
       </div>
@@ -472,39 +472,37 @@
   </div>
 
   <!-- Modal de Mis Turnos (Para que el cliente consulte sus turnos) -->
-  <div id="myAppointmentsModal" class="fixed inset-0 z-50 bg-slate-900/80 backdrop-blur-sm hidden flex items-center justify-center p-4">
-    <div class="bg-white rounded-3xl p-5 sm:p-7 max-w-lg w-full border border-slate-200 shadow-2xl animate-fade-in flex flex-col max-h-[90vh]">
+  <div id="myAppointmentsModal" class="fixed inset-0 z-50 bg-black/85 backdrop-blur-md hidden flex items-center justify-center p-4">
+    <div class="bg-[#15181e] rounded-3xl p-5 sm:p-7 max-w-lg w-full border border-white/10 shadow-2xl animate-fade-in flex flex-col max-h-[90vh] text-white">
       
       <!-- Encabezado del modal -->
-      <div class="flex items-center justify-between pb-3.5 border-b border-slate-100 flex-shrink-0">
+      <div class="flex items-center justify-between pb-3.5 border-b border-white/10 flex-shrink-0">
         <div class="flex items-center gap-2.5 text-left">
-          <div class="w-10 h-10 rounded-xl bg-amber-500 text-slate-950 flex items-center justify-center font-bold">
-            <i data-lucide="calendar-check" class="w-5 h-5"></i>
+          <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-amber-400 to-amber-600 text-slate-950 flex items-center justify-center font-bold shadow-md shadow-amber-500/20">
+            <i data-lucide="calendar-check" class="w-5 h-5 stroke-[2.5]"></i>
           </div>
           <div>
-            <h3 class="text-lg sm:text-xl font-extrabold text-slate-950">Mis Turnos</h3>
-            <p class="text-xs text-slate-500">Tus reservas en Barbería Paco</p>
+            <h3 class="text-lg sm:text-xl font-extrabold text-white">Mis Turnos</h3>
+            <p class="text-xs text-slate-400">Tus reservas en Barbería Paco</p>
           </div>
         </div>
-        <button type="button" onclick="closeMyAppointmentsModal()" class="w-8 h-8 rounded-full bg-slate-100 hover:bg-slate-200 text-slate-500 hover:text-slate-800 flex items-center justify-center transition">
+        <button type="button" onclick="closeMyAppointmentsModal()" class="w-8 h-8 rounded-full bg-white/5 hover:bg-white/10 text-slate-400 hover:text-white border border-white/10 flex items-center justify-center transition">
           <i data-lucide="x" class="w-4 h-4"></i>
         </button>
       </div>
 
-
-
       <!-- Lista deslizable de turnos -->
-      <div id="myAppointmentsList" class="flex-1 overflow-y-auto py-2 space-y-3 pr-1 text-left">
+      <div id="myAppointmentsList" class="flex-1 overflow-y-auto py-3 space-y-3 pr-1 text-left">
         <!-- Inyectado dinámicamente por app.js -->
       </div>
 
       <!-- Pie del modal -->
-      <div class="pt-3 border-t border-slate-100 flex items-center justify-between gap-2 flex-shrink-0">
-        <button type="button" onclick="closeMyAppointmentsModal(); startBookingFlow();" class="py-2.5 px-4 bg-amber-500 hover:bg-amber-600 text-slate-950 font-bold text-xs rounded-xl transition flex items-center gap-1.5 shadow-xs">
-          <i data-lucide="plus" class="w-3.5 h-3.5"></i>
+      <div class="pt-3 border-t border-white/10 flex items-center justify-between gap-2 flex-shrink-0">
+        <button type="button" onclick="closeMyAppointmentsModal(); startBookingFlow();" class="py-2.5 px-4 bg-gradient-to-r from-amber-400 to-amber-500 hover:brightness-110 text-slate-950 font-extrabold text-xs rounded-xl transition flex items-center gap-1.5 shadow-md shadow-amber-500/20">
+          <i data-lucide="plus" class="w-3.5 h-3.5 stroke-[2.5]"></i>
           <span>Pedir nuevo turno</span>
         </button>
-        <button type="button" onclick="closeMyAppointmentsModal()" class="py-2.5 px-4 bg-slate-100 hover:bg-slate-200 text-slate-700 font-semibold text-xs rounded-xl transition">
+        <button type="button" onclick="closeMyAppointmentsModal()" class="py-2.5 px-4 bg-white/5 hover:bg-white/10 text-slate-300 hover:text-white font-semibold text-xs rounded-xl border border-white/10 transition">
           Cerrar
         </button>
       </div>
@@ -512,7 +510,7 @@
     </div>
   </div>
 
-  <footer class="py-4 text-center text-xs text-slate-400">
+  <footer class="py-6 text-center text-xs text-slate-500 border-t border-white/5 bg-[#0a0c0f]">
     <p>Barbería Paco • Belgrano 1450, Esperanza</p>
   </footer>
 
