@@ -1,6 +1,5 @@
 // app.js - Sistema de Agendamiento Online Barbería Paco con Calendario Optimizado y Validación Estricta
 
-const ADMIN_PIN = '1234';
 const BARBER_PHONE = '3496446229';
 const BARBER_WHATSAPP = '5493496446229';
 
@@ -96,17 +95,6 @@ function buildAppointmentWhatsAppMessage(app) {
   return msg;
 }
 
-// Abre automáticamente WhatsApp con los datos del turno cargados para el número de Paco (3496446229)
-function notifyBarberNewBooking(app) {
-  try {
-    const msg = buildAppointmentWhatsAppMessage(app);
-    const waUrl = `https://wa.me/${BARBER_WHATSAPP}?text=${encodeURIComponent(msg)}`;
-    window.open(waUrl, '_blank');
-  } catch (e) {
-    console.error('Error abriendo WhatsApp:', e);
-  }
-}
-
 // Comprueba si un horario ya pasó en el día de hoy (o si la fecha ya pasó)
 function isTimePassed(dateKey, timeStr) {
   const todayKey = getDateKey(0);
@@ -122,53 +110,329 @@ function isTimePassed(dateKey, timeStr) {
   return (slotH < currentH) || (slotH === currentH && slotM <= currentM);
 }
 
-// Persistencia en LocalStorage
-function getInitialAppointments() {
-  const today = getDateKey(0);
-  const tomorrow = getDateKey(1);
-  return [
-    { id: 'b-1', clientName: 'Carlos M.', phone: '3496421100', serviceId: 'corte', date: today, time: '09:30', status: 'confirmed' },
-    { id: 'b-2', clientName: 'Agustín G.', phone: '3496489912', serviceId: 'corte_barba', date: today, time: '11:00', status: 'confirmed' },
-    { id: 'b-3', clientName: 'Roberto B.', phone: '3496554433', serviceId: 'barba', date: today, time: '17:00', status: 'confirmed' },
-    { id: 'b-4', clientName: 'Facundo M.', phone: '3496523311', serviceId: 'corte', date: tomorrow, time: '10:00', status: 'confirmed' }
-  ];
+// ----------------------------------------------------
+// SEGURIDAD: escapar texto que escriben los clientes
+// ----------------------------------------------------
+function escapeHtml(value) {
+  return String(value == null ? '' : value)
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&#39;');
 }
 
-function getStoredAppointments() {
+// ----------------------------------------------------
+// CAPA DE DATOS
+// - Con Firebase configurado (config.js): turnos compartidos entre todos los dispositivos.
+// - Sin configurar: "modo prueba" que guarda todo solo en este navegador.
+// ----------------------------------------------------
+const CFG = window.BARBERIA_CONFIG || {};
+const USE_FIREBASE = !!(CFG.firebase && CFG.firebase.apiKey && CFG.firebase.projectId && window.firebase);
+let fbDb = null;
+let fbAuth = null;
+if (USE_FIREBASE) {
+  firebase.initializeApp(CFG.firebase);
+  fbDb = firebase.firestore();
+  fbAuth = firebase.auth();
+}
+
+const LS_APPS = 'barberia_paco_appointments';
+const LS_DISABLED = 'barberia_paco_disabled_slots';
+const LS_MY_BOOKINGS = 'barberia_paco_my_bookings'; // [{ id, token }]
+const DEMO_PASSWORD = 'demo'; // Solo modo prueba (sin Firebase). Nunca protege datos reales.
+
+// Limpieza única de claves viejas (nombre anterior del proyecto y formato anterior)
+(function cleanupLegacyStorage() {
   try {
-    const raw = localStorage.getItem('barberia_paco_appointments') || localStorage.getItem('barberia_said_appointments');
-    if (raw) {
-      const parsed = JSON.parse(raw);
-      if (Array.isArray(parsed)) return parsed;
+    ['barberia_said_appointments', 'barberia_said_disabled_slots', 'barberia_paco_my_booking_ids', 'barberia_paco_my_phone']
+      .forEach(k => localStorage.removeItem(k));
+    ['barberia_said_admin_logged', 'barberia_paco_admin_logged']
+      .forEach(k => sessionStorage.removeItem(k));
+  } catch (e) {}
+})();
+
+function lsRead(key, fallback) {
+  try {
+    const raw = localStorage.getItem(key);
+    return raw ? JSON.parse(raw) : fallback;
+  } catch (e) {
+    return fallback;
+  }
+}
+function lsWrite(key, value) {
+  try { localStorage.setItem(key, JSON.stringify(value)); } catch (e) {}
+}
+
+function newId() {
+  if (window.crypto && crypto.randomUUID) return crypto.randomUUID();
+  const bytes = new Uint8Array(16);
+  crypto.getRandomValues(bytes);
+  return Array.from(bytes, b => b.toString(16).padStart(2, '0')).join('');
+}
+
+// ID del documento de un horario: "2026-10-01_1000"
+function slotDocId(date, time) {
+  return `${date}_${time.replace(':', '')}`;
+}
+
+function mapAppointment(snap) {
+  const r = snap.data();
+  return {
+    id: snap.id,
+    token: snap.id, // el ID secreto del turno es el código del cliente
+    clientName: r.clientName,
+    phone: r.phone,
+    notes: r.notes || '',
+    serviceId: r.serviceId,
+    date: r.date,
+    time: r.time,
+    status: r.status,
+    lock: r.lock
+  };
+}
+
+function disabledSnapToMap(snap) {
+  const map = {};
+  snap.forEach(d => {
+    const r = d.data();
+    if (!map[r.date]) map[r.date] = [];
+    map[r.date].push(r.time);
+  });
+  return map;
+}
+
+// Turnos propios guardados en este dispositivo (el ID secreto de cada turno)
+function getMyBookings() {
+  const list = lsRead(LS_MY_BOOKINGS, []);
+  return Array.isArray(list) ? list.filter(b => b && b.id && b.token) : [];
+}
+function addMyBooking(id, token) {
+  const list = getMyBookings().filter(b => b.id !== id);
+  list.push({ id, token });
+  lsWrite(LS_MY_BOOKINGS, list);
+}
+function removeMyBooking(id) {
+  lsWrite(LS_MY_BOOKINGS, getMyBookings().filter(b => b.id !== id));
+}
+
+function waitForAuthReady() {
+  return new Promise(resolve => {
+    const unsubscribe = fbAuth.onAuthStateChanged(user => {
+      unsubscribe();
+      resolve(user);
+    });
+  });
+}
+
+const Api = {
+  // Horarios ocupados y cerrados (sin datos personales) para el calendario del cliente
+  async loadPublic() {
+    if (!USE_FIREBASE) {
+      return { apps: lsRead(LS_APPS, []), disabled: lsRead(LS_DISABLED, {}) };
     }
-  } catch (e) {
-    console.error('Error al leer turnos:', e);
-  }
-  return getInitialAppointments();
-}
+    const from = getDateKey(-1);
+    const [slots, dis] = await Promise.all([
+      fbDb.collection('slots').where('date', '>=', from).get(),
+      fbDb.collection('disabled').where('date', '>=', from).get()
+    ]);
+    const apps = [];
+    slots.forEach(d => {
+      const r = d.data();
+      if (r.taken) apps.push({ date: r.date, time: r.time, status: 'confirmed' });
+    });
+    return { apps, disabled: disabledSnapToMap(dis) };
+  },
 
-function getStoredDisabledSlots() {
-  try {
-    const raw = localStorage.getItem('barberia_paco_disabled_slots') || localStorage.getItem('barberia_said_disabled_slots');
-    if (raw) {
-      const parsed = JSON.parse(raw);
-      if (typeof parsed === 'object' && parsed !== null) return parsed;
+  // Turnos completos (con nombre y teléfono) — solo el barbero logueado
+  async loadAdmin() {
+    if (!USE_FIREBASE) {
+      return { apps: lsRead(LS_APPS, []), disabled: lsRead(LS_DISABLED, {}) };
     }
-  } catch (e) {
-    console.error('Error al leer horarios deshabilitados:', e);
-  }
-  return {};
-}
+    const from = getDateKey(-62);
+    const [apps, dis] = await Promise.all([
+      fbDb.collection('appointments').where('date', '>=', from).get(),
+      fbDb.collection('disabled').where('date', '>=', from).get()
+    ]);
+    const list = [];
+    apps.forEach(d => {
+      const a = mapAppointment(d);
+      if (a.status === 'confirmed') list.push(a);
+    });
+    list.sort((a, b) => (a.date + a.time).localeCompare(b.date + b.time));
+    return { apps: list, disabled: disabledSnapToMap(dis) };
+  },
 
-let appointments = getStoredAppointments();
-let disabledSlotsByDate = getStoredDisabledSlots();
+  async book(b) {
+    if (!USE_FIREBASE) {
+      const apps = lsRead(LS_APPS, []);
+      const disabled = lsRead(LS_DISABLED, {});
+      if (apps.some(a => a.date === b.date && a.time === b.time && a.status === 'confirmed') ||
+          (disabled[b.date] || []).includes(b.time)) {
+        throw new Error('OCUPADO');
+      }
+      const app = { id: newId(), status: 'confirmed', createdAt: new Date().toISOString(), ...b };
+      app.token = app.id;
+      apps.push(app);
+      lsWrite(LS_APPS, apps);
+      return { id: app.id, token: app.token };
+    }
 
-function saveAppointments() {
-  try {
-    localStorage.setItem('barberia_paco_appointments', JSON.stringify(appointments));
-  } catch (e) {
-    console.error('Error guardando en localStorage:', e);
+    const id = newId();   // código secreto del turno
+    const lock = newId(); // candado que une el turno con su horario
+    const slotRef = fbDb.collection('slots').doc(slotDocId(b.date, b.time));
+    const apptRef = fbDb.collection('appointments').doc(id);
+
+    const batch = fbDb.batch();
+    batch.set(slotRef, { date: b.date, time: b.time, taken: true, lock });
+    batch.set(apptRef, {
+      clientName: b.clientName,
+      phone: b.phone,
+      notes: b.notes || '',
+      serviceId: b.serviceId,
+      date: b.date,
+      time: b.time,
+      status: 'confirmed',
+      lock,
+      createdAt: firebase.firestore.FieldValue.serverTimestamp()
+    });
+
+    try {
+      await batch.commit();
+    } catch (e) {
+      if (e && e.code === 'permission-denied') {
+        // Las reglas rechazan la reserva: ¿el horario ya estaba tomado?
+        try {
+          const s = await slotRef.get();
+          if (s.exists && s.data().taken) throw new Error('OCUPADO');
+        } catch (inner) {
+          if (inner.message === 'OCUPADO') throw inner;
+        }
+        throw new Error('INVALIDO');
+      }
+      throw e;
+    }
+    return { id, token: id };
+  },
+
+  async myAppointments() {
+    const mine = getMyBookings();
+    if (mine.length === 0) return [];
+    if (!USE_FIREBASE) {
+      const tokens = mine.map(m => m.token);
+      return lsRead(LS_APPS, []).filter(a => a.status === 'confirmed' && tokens.includes(a.token));
+    }
+    const results = await Promise.allSettled(
+      mine.map(m => fbDb.collection('appointments').doc(m.token).get())
+    );
+    const list = [];
+    results.forEach((r, i) => {
+      if (r.status === 'fulfilled' && r.value.exists && r.value.data().status === 'confirmed') {
+        list.push(mapAppointment(r.value));
+      } else if (r.status === 'rejected' && r.reason && r.reason.code !== 'permission-denied') {
+        // Error de conexión: no borramos nada
+      } else {
+        // Turno cancelado o inexistente: se quita de este dispositivo
+        removeMyBooking(mine[i].id);
+      }
+    });
+    return list;
+  },
+
+  async cancelMine(app) {
+    if (!USE_FIREBASE) {
+      lsWrite(LS_APPS, lsRead(LS_APPS, []).filter(a => a.id !== app.id));
+      return;
+    }
+    await fbDb.collection('appointments').doc(app.id).update({ status: 'cancelled' });
+    // Liberar el horario para otra persona (usa el código del turno como prueba)
+    try {
+      await fbDb.collection('slots').doc(slotDocId(app.date, app.time)).update({ taken: false, proof: app.id });
+    } catch (e) {
+      console.warn('El turno se canceló pero el horario no se pudo liberar:', e);
+    }
+  },
+
+  async adminCancel(id) {
+    if (!USE_FIREBASE) {
+      lsWrite(LS_APPS, lsRead(LS_APPS, []).filter(a => a.id !== id));
+      return;
+    }
+    const app = appointments.find(a => a.id === id);
+    const batch = fbDb.batch();
+    batch.update(fbDb.collection('appointments').doc(id), { status: 'cancelled' });
+    if (app) {
+      batch.set(fbDb.collection('slots').doc(slotDocId(app.date, app.time)), { taken: false }, { merge: true });
+    }
+    await batch.commit();
+  },
+
+  async setSlotsDisabled(date, times, disable) {
+    if (!USE_FIREBASE) {
+      const map = lsRead(LS_DISABLED, {});
+      const current = new Set(map[date] || []);
+      times.forEach(t => (disable ? current.add(t) : current.delete(t)));
+      map[date] = Array.from(current);
+      lsWrite(LS_DISABLED, map);
+      return;
+    }
+    const batch = fbDb.batch();
+    times.forEach(time => {
+      const ref = fbDb.collection('disabled').doc(slotDocId(date, time));
+      if (disable) batch.set(ref, { date, time });
+      else batch.delete(ref);
+    });
+    await batch.commit();
+  },
+
+  // ---- Acceso del barbero ----
+  async isBarberLoggedIn() {
+    if (!USE_FIREBASE) {
+      try { return sessionStorage.getItem('barberia_paco_demo_admin') === '1'; } catch (e) { return false; }
+    }
+    const user = fbAuth.currentUser || await waitForAuthReady();
+    if (!user) return false;
+    return Api.checkBarberAccess();
+  },
+
+  // Las reglas de Firestore deciden: solo el barbero puede listar turnos
+  async checkBarberAccess() {
+    try {
+      await fbDb.collection('appointments').where('date', '>=', getDateKey(0)).limit(1).get();
+      return true;
+    } catch (e) {
+      return false;
+    }
+  },
+
+  async login(email, password) {
+    if (!USE_FIREBASE) {
+      if (password !== DEMO_PASSWORD) throw new Error('bad');
+      try { sessionStorage.setItem('barberia_paco_demo_admin', '1'); } catch (e) {}
+      return;
+    }
+    await fbAuth.signInWithEmailAndPassword(email, password);
+    if (!(await Api.checkBarberAccess())) {
+      await fbAuth.signOut();
+      throw new Error('not_barber');
+    }
+  },
+
+  async logout() {
+    if (!USE_FIREBASE) {
+      try { sessionStorage.removeItem('barberia_paco_demo_admin'); } catch (e) {}
+      return;
+    }
+    await fbAuth.signOut();
   }
+};
+
+// Caché en memoria que usan las pantallas
+let appointments = [];
+let disabledSlotsByDate = {};
+let adminMode = false; // true mientras el panel del barbero está abierto (datos completos)
+
+function rerenderAll() {
   renderVisualCalendar();
   renderSimpleTimesGrid();
   renderAdminCalendar();
@@ -176,35 +440,24 @@ function saveAppointments() {
   renderAdminScheduleSlots();
 }
 
-function saveDisabledSlots() {
+async function refreshData() {
   try {
-    localStorage.setItem('barberia_paco_disabled_slots', JSON.stringify(disabledSlotsByDate));
+    const result = adminMode ? await Api.loadAdmin() : await Api.loadPublic();
+    appointments = Array.isArray(result.apps) ? result.apps : [];
+    disabledSlotsByDate = result.disabled || {};
   } catch (e) {
-    console.error('Error guardando disabled slots:', e);
+    console.error('No se pudieron cargar los turnos:', e);
   }
-  renderVisualCalendar();
-  renderSimpleTimesGrid();
-  renderAdminCalendar();
-  renderAdminScheduleSlots();
+  rerenderAll();
 }
 
-// Sincronización en tiempo real entre pestañas
+// Actualización automática: cada 30 s y al volver a la pestaña
+setInterval(() => { if (document.visibilityState === 'visible') refreshData(); }, 30000);
+document.addEventListener('visibilitychange', () => { if (document.visibilityState === 'visible') refreshData(); });
+
+// Modo prueba: sincronizar entre pestañas del mismo navegador
 window.addEventListener('storage', (e) => {
-  if (e.key === 'barberia_paco_appointments' || e.key === 'barberia_said_appointments') {
-    appointments = getStoredAppointments();
-    renderVisualCalendar();
-    renderSimpleTimesGrid();
-    renderAdminCalendar();
-    updateAdminAppointments();
-    renderAdminScheduleSlots();
-  }
-  if (e.key === 'barberia_paco_disabled_slots' || e.key === 'barberia_said_disabled_slots') {
-    disabledSlotsByDate = getStoredDisabledSlots();
-    renderVisualCalendar();
-    renderSimpleTimesGrid();
-    renderAdminCalendar();
-    renderAdminScheduleSlots();
-  }
+  if (!USE_FIREBASE && (e.key === LS_APPS || e.key === LS_DISABLED)) refreshData();
 });
 
 // ----------------------------------------------------
@@ -418,9 +671,6 @@ function renderSimpleTimesGrid() {
   const title = document.getElementById('selectedDaySlotsTitle');
   if (!container) return;
 
-  appointments = getStoredAppointments();
-  disabledSlotsByDate = getStoredDisabledSlots();
-
   if (title) {
     title.innerHTML = `Horarios para el <strong class="text-slate-900 font-extrabold">${formatDateDisplay(currentBooking.date)}</strong>:`;
   }
@@ -550,7 +800,7 @@ function renderSummary() {
   `;
 }
 
-function confirmSimpleBooking() {
+async function confirmSimpleBooking() {
   const nameInput = document.getElementById('simpleClientName');
   const phoneInput = document.getElementById('simpleClientPhone');
   const notesInput = document.getElementById('simpleClientNotes');
@@ -596,40 +846,72 @@ function confirmSimpleBooking() {
     return;
   }
 
-  appointments = getStoredAppointments();
-  disabledSlotsByDate = getStoredDisabledSlots();
-
-  const occupied = appointments.some(a => a.date === currentBooking.date && a.time === currentBooking.time && a.status === 'confirmed');
-  const disabled = (disabledSlotsByDate[currentBooking.date] || []).includes(currentBooking.time);
-
-  if (occupied || disabled) {
-    alert('Ese horario acaba de ser ocupado. Por favor elegí otro horario.');
-    goToStep(2);
+  if (name.length > 80) {
+    alert('El nombre es demasiado largo (máximo 80 caracteres).');
+    if (nameInput) nameInput.focus();
+    return;
+  }
+  if (phone.length > 15) {
+    alert('El teléfono tiene demasiados dígitos.');
+    if (phoneInput) phoneInput.focus();
     return;
   }
 
   const newApp = {
-    id: 'b-' + Date.now(),
     clientName: name,
     phone: phone, // Garantizado solo números
-    notes: notes, // Aclaraciones opcionales del cliente
+    notes: notes.slice(0, 300), // Aclaraciones opcionales del cliente
     serviceId: currentBooking.service.id,
     date: currentBooking.date,
-    time: currentBooking.time,
-    status: 'confirmed',
-    createdAt: new Date().toISOString()
+    time: currentBooking.time
   };
 
-  appointments.push(newApp);
-  saveAppointments();
+  if (bookingInProgress) return;
+  bookingInProgress = true;
+  setConfirmButtonLoading(true);
 
-  // Guardar en el dispositivo del cliente para la sección Mis Turnos
-  saveClientBooking(newApp.id, phone);
+  try {
+    // La base de datos vuelve a comprobar que el horario esté libre (evita turnos dobles)
+    const { id, token } = await Api.book(newApp);
+    newApp.id = id;
+    newApp.token = token;
+    newApp.status = 'confirmed';
 
-  // Abrir automáticamente WhatsApp con los datos del turno hacia el 3496446229
-  notifyBarberNewBooking(newApp);
+    // Guardar en el dispositivo del cliente para la sección Mis Turnos
+    addMyBooking(id, token);
 
-  showSimpleSuccess(newApp);
+    showSimpleSuccess(newApp);
+    refreshData();
+  } catch (e) {
+    const msg = String((e && e.message) || '');
+    if (msg.includes('OCUPADO')) {
+      alert('Ese horario acaba de ser ocupado. Por favor elegí otro horario.');
+      await refreshData();
+      goToStep(2);
+    } else if (msg.includes('LIMITE')) {
+      alert('Ya tenés varios turnos reservados con ese teléfono. Si necesitás otro, escribile a Paco por WhatsApp.');
+    } else if (msg.includes('INVALIDO')) {
+      alert('Ese día u horario no está disponible. Por favor elegí otro.');
+      await refreshData();
+      goToStep(2);
+    } else {
+      console.error('Error al reservar:', e);
+      alert('No se pudo guardar el turno. Revisá tu conexión e intentá de nuevo.');
+    }
+  } finally {
+    bookingInProgress = false;
+    setConfirmButtonLoading(false);
+  }
+}
+
+let bookingInProgress = false;
+
+function setConfirmButtonLoading(loading) {
+  const btn = document.getElementById('confirmBookingBtn');
+  if (!btn) return;
+  btn.disabled = loading;
+  btn.classList.toggle('opacity-60', loading);
+  btn.classList.toggle('cursor-wait', loading);
 }
 
 function showSimpleSuccess(app) {
@@ -644,11 +926,11 @@ function showSimpleSuccess(app) {
   details.innerHTML = `
     <div class="flex justify-between border-b border-white/10 pb-1.5">
       <span class="text-slate-400">Cliente:</span>
-      <strong class="text-white font-bold">${app.clientName}</strong>
+      <strong class="text-white font-bold">${escapeHtml(app.clientName)}</strong>
     </div>
     <div class="flex justify-between border-b border-white/10 pb-1.5">
       <span class="text-slate-400">Teléfono:</span>
-      <strong class="text-white font-mono">${app.phone}</strong>
+      <strong class="text-white font-mono">${escapeHtml(app.phone)}</strong>
     </div>
     <div class="flex justify-between border-b border-white/10 pb-1.5">
       <span class="text-slate-400">Servicio:</span>
@@ -661,7 +943,7 @@ function showSimpleSuccess(app) {
     ${app.notes ? `
     <div class="flex justify-between border-b border-white/10 pb-1.5">
       <span class="text-slate-400">Aclaración:</span>
-      <span class="text-slate-300 font-medium italic text-right max-w-[200px]">"${app.notes}"</span>
+      <span class="text-slate-300 font-medium italic text-right max-w-[200px]">"${escapeHtml(app.notes)}"</span>
     </div>
     ` : ''}
     <div class="flex justify-between pt-1 text-slate-400">
@@ -669,16 +951,19 @@ function showSimpleSuccess(app) {
       <span class="font-medium text-slate-200">Belgrano 1450, Esperanza</span>
     </div>
     <div class="mt-3 pt-3 border-t border-white/10">
-      <a href="${waUrl}" target="_blank" class="w-full flex items-center justify-center gap-2 py-2.5 px-3 bg-emerald-600 hover:bg-emerald-500 text-white font-bold rounded-xl text-xs transition shadow-md shadow-emerald-950/50">
-        <i data-lucide="message-circle" class="w-4 h-4"></i>
-        <span>Enviar aviso por WhatsApp a Paco (3496-446229)</span>
+      <a href="${waUrl}" class="w-full flex items-center justify-center gap-2 py-3.5 px-3 bg-emerald-600 hover:bg-emerald-500 text-white font-extrabold rounded-xl text-sm transition shadow-md shadow-emerald-950/50">
+        <i data-lucide="message-circle" class="w-5 h-5"></i>
+        <span>Abrir WhatsApp de nuevo</span>
       </a>
-      <p class="text-[11px] text-slate-500 text-center mt-1">Se abrió WhatsApp con los datos del turno para que le llegue a Paco.</p>
+      <p class="text-[11px] text-slate-500 text-center mt-1">Si no se abrió solo, tocá este botón.</p>
     </div>
   `;
 
   modal.classList.remove('hidden');
   safeRenderIcons();
+
+  // Llevar directo a WhatsApp con el mensaje armado para Paco
+  setTimeout(() => { window.location.href = waUrl; }, 400);
 }
 
 function viewBookedDateInCalendar() {
@@ -742,20 +1027,6 @@ function closeSuccessModalAndOpenMyTurnos() {
 // ----------------------------------------------------
 // SECCIÓN MIS TURNOS (CLIENTE)
 // ----------------------------------------------------
-function saveClientBooking(id, phone) {
-  try {
-    let myIds = [];
-    const raw = localStorage.getItem('barberia_paco_my_booking_ids');
-    if (raw) myIds = JSON.parse(raw);
-    if (!Array.isArray(myIds)) myIds = [];
-    if (!myIds.includes(id)) myIds.push(id);
-    localStorage.setItem('barberia_paco_my_booking_ids', JSON.stringify(myIds));
-    if (phone) localStorage.setItem('barberia_paco_my_phone', phone);
-  } catch (e) {
-    console.error('Error guardando turno local:', e);
-  }
-}
-
 function openMyAppointmentsModal() {
   const modal = document.getElementById('myAppointmentsModal');
   if (!modal) return;
@@ -770,28 +1041,23 @@ function closeMyAppointmentsModal() {
   if (modal) modal.classList.add('hidden');
 }
 
-function renderMyAppointmentsList() {
+let myAppointmentsCache = [];
+
+async function renderMyAppointmentsList() {
   const listContainer = document.getElementById('myAppointmentsList');
   if (!listContainer) return;
 
-  appointments = getStoredAppointments();
+  listContainer.innerHTML = `<div class="py-10 text-center text-xs text-slate-400">Cargando tus turnos...</div>`;
 
-  let myIds = [];
+  let matched = [];
   try {
-    const raw = localStorage.getItem('barberia_paco_my_booking_ids');
-    if (raw) myIds = JSON.parse(raw);
-    if (!Array.isArray(myIds)) myIds = [];
-  } catch (e) {}
-
-  const savedPhone = (localStorage.getItem('barberia_paco_my_phone') || '').trim().replace(/[^0-9]/g, '');
-
-  // Filtrar turnos confirmados que correspondan al cliente
-  const matched = appointments.filter(a => {
-    if (a.status !== 'confirmed') return false;
-    const matchId = myIds.includes(a.id);
-    const matchPhone = savedPhone && a.phone && a.phone.replace(/[^0-9]/g, '') === savedPhone;
-    return matchId || matchPhone;
-  });
+    matched = await Api.myAppointments();
+  } catch (e) {
+    console.error('Error cargando mis turnos:', e);
+    listContainer.innerHTML = `<div class="py-10 text-center text-xs text-red-300">No se pudieron cargar tus turnos. Revisá tu conexión.</div>`;
+    return;
+  }
+  myAppointmentsCache = matched;
 
   if (matched.length === 0) {
     listContainer.innerHTML = `
@@ -870,7 +1136,7 @@ function renderMyAppointmentsList() {
             </div>
             <div class="flex justify-between">
               <span class="text-slate-400">A nombre de:</span>
-              <strong class="text-white">${app.clientName}</strong>
+              <strong class="text-white">${escapeHtml(app.clientName)}</strong>
             </div>
             <div class="flex justify-between">
               <span class="text-slate-400">Lugar:</span>
@@ -879,7 +1145,7 @@ function renderMyAppointmentsList() {
             ${app.notes ? `
             <div class="flex justify-between border-t border-white/10 pt-1.5 mt-1">
               <span class="text-slate-400 flex-shrink-0">Aclaración:</span>
-              <span class="text-amber-300 font-medium italic text-right pl-2">"${app.notes}"</span>
+              <span class="text-amber-300 font-medium italic text-right pl-2">"${escapeHtml(app.notes)}"</span>
             </div>
             ` : ''}
           </div>
@@ -920,8 +1186,8 @@ function renderMyAppointmentsList() {
             <span class="font-mono text-slate-300 font-semibold">${app.time} hs</span>
             <div>
               <span class="font-bold text-white block">${dateStr}</span>
-              <span class="text-[11px] text-slate-400">${s.name} • ${app.clientName}</span>
-              ${app.notes ? `<span class="text-[10px] text-slate-500 italic block mt-0.5">"${app.notes}"</span>` : ''}
+              <span class="text-[11px] text-slate-400">${s.name} • ${escapeHtml(app.clientName)}</span>
+              ${app.notes ? `<span class="text-[10px] text-slate-500 italic block mt-0.5">"${escapeHtml(app.notes)}"</span>` : ''}
             </div>
           </div>
           <span class="text-[10px] text-slate-400 font-medium bg-white/5 px-2 py-0.5 rounded border border-white/5">
@@ -938,45 +1204,42 @@ function renderMyAppointmentsList() {
   safeRenderIcons();
 }
 
-function clientPromptCancelAppointment(appId) {
-  appointments = getStoredAppointments();
-  const app = appointments.find(a => a.id === appId);
+async function clientPromptCancelAppointment(appId) {
+  const app = myAppointmentsCache.find(a => a.id === appId);
   if (!app) return;
 
   const s = SERVICES.find(x => x.id === app.serviceId) || SERVICES[0];
   const dateStr = formatDateDisplay(app.date);
 
-  const confirmMsg = `¿Estás seguro de que querés cancelar tu turno de ${s.name} para el ${dateStr} a las ${app.time} hs?\n\nAl cancelarlo, el horario quedará libre para otra persona.`;
+  const confirmMsg = `¿Estás seguro de que querés cancelar tu turno de ${s.name} para el ${dateStr} a las ${app.time} hs?\n\nAl cancelarlo, el horario quedará libre para otra persona y se abrirá WhatsApp para avisarle a Paco.`;
   if (!confirm(confirmMsg)) {
     return;
   }
 
-  // Eliminar el turno
-  appointments = appointments.filter(a => a.id !== appId);
-  saveAppointments();
-
-  // Actualizar lista de IDs locales
   try {
-    let myIds = [];
-    const raw = localStorage.getItem('barberia_paco_my_booking_ids');
-    if (raw) myIds = JSON.parse(raw);
-    if (Array.isArray(myIds)) {
-      myIds = myIds.filter(id => id !== appId);
-      localStorage.setItem('barberia_paco_my_booking_ids', JSON.stringify(myIds));
-    }
-  } catch (e) {}
+    await Api.cancelMine(app);
+    removeMyBooking(app.id);
+  } catch (e) {
+    console.error('Error cancelando turno:', e);
+    alert('No se pudo cancelar el turno. Intentá de nuevo o avisale a Paco por WhatsApp.');
+    await refreshData();
+    renderMyAppointmentsList();
+    return;
+  }
 
-  alert('Tu turno ha sido cancelado con éxito.');
-
+  refreshData();
   renderMyAppointmentsList();
+
+  // Avisar a Paco por WhatsApp (obligatorio): se abre directo con el mensaje armado
+  const msg = `Hola Paco! Cancelo mi turno de ${s.name} del día ${formatDateSimple(app.date)} a las ${app.time}. Mi nombre es ${app.clientName}.`;
+  window.location.href = `https://wa.me/${BARBER_WHATSAPP}?text=${encodeURIComponent(msg)}`;
 }
 
 // ----------------------------------------------------
 // ACCESO ADMIN BARBERO
 // ----------------------------------------------------
-function handleAdminClick() {
-  const isLogged = sessionStorage.getItem('barberia_paco_admin_logged') === 'true' || sessionStorage.getItem('barberia_said_admin_logged') === 'true';
-  if (isLogged) {
+async function handleAdminClick() {
+  if (await Api.isBarberLoggedIn()) {
     openAdminModal();
   } else {
     openAdminLoginModal();
@@ -985,9 +1248,12 @@ function handleAdminClick() {
 
 function openAdminLoginModal() {
   const modal = document.getElementById('adminLoginModal');
-  const input = document.getElementById('adminPinInput');
+  const input = document.getElementById('adminPasswordInput');
   const error = document.getElementById('adminLoginError');
+  const demoHint = document.getElementById('adminDemoHint');
   if (!modal) return;
+
+  if (demoHint) demoHint.classList.toggle('hidden', USE_FIREBASE);
 
   if (error) error.classList.add('hidden');
   if (input) input.value = '';
@@ -1000,28 +1266,37 @@ function closeAdminLoginModal() {
   if (modal) modal.classList.add('hidden');
 }
 
-function verifyAdminPin(e) {
+async function verifyAdminLogin(e) {
   e.preventDefault();
-  const input = document.getElementById('adminPinInput');
+  const input = document.getElementById('adminPasswordInput');
   const error = document.getElementById('adminLoginError');
-  const enteredPin = input ? input.value.trim() : '';
+  const btn = document.getElementById('adminLoginSubmitBtn');
+  const password = input ? input.value : '';
 
-  if (enteredPin === ADMIN_PIN) {
-    sessionStorage.setItem('barberia_paco_admin_logged', 'true');
+  if (btn) btn.disabled = true;
+  try {
+    // Solo contraseña: el email del barbero viene de config.js
+    await Api.login(CFG.barberEmail || '', password);
     closeAdminLoginModal();
     openAdminModal();
-  } else {
-    if (error) error.classList.remove('hidden');
+  } catch (err) {
+    if (error) {
+      error.textContent = (err && err.code === 'auth/too-many-requests')
+        ? 'Demasiados intentos. Esperá unos minutos y probá de nuevo.'
+        : 'Contraseña incorrecta. Intentá de nuevo.';
+      error.classList.remove('hidden');
+    }
     if (input) {
       input.value = '';
       input.focus();
     }
+  } finally {
+    if (btn) btn.disabled = false;
   }
 }
 
-function logoutAdmin() {
-  sessionStorage.removeItem('barberia_paco_admin_logged');
-  sessionStorage.removeItem('barberia_said_admin_logged');
+async function logoutAdmin() {
+  await Api.logout();
   closeAdminModal();
 }
 
@@ -1053,15 +1328,24 @@ function openAdminModal() {
   if (wrapper) wrapper.classList.add('hidden');
   if (btnText) btnText.textContent = 'Ver Calendario';
 
+  adminMode = true;
   renderAdminCalendar();
   updateAdminAppointments();
   renderAdminScheduleSlots();
+  refreshData();
 }
 
 function closeAdminModal() {
   const modal = document.getElementById('adminModal');
   if (!modal) return;
+  const wasOpen = !modal.classList.contains('hidden');
   modal.classList.add('hidden');
+  if (adminMode) {
+    // Al salir del panel se descartan los datos personales de la memoria
+    adminMode = false;
+    appointments = [];
+    if (wasOpen) refreshData();
+  }
 }
 
 function toggleAdminCalendar() {
@@ -1222,8 +1506,6 @@ function updateAdminAppointments() {
 
   if (!container) return;
 
-  appointments = getStoredAppointments();
-
   const isToday = (adminSelectedDate === getDateKey(0));
   if (label) {
     label.textContent = `${formatDateDisplay(adminSelectedDate)}${isToday ? ' (Hoy)' : ''}`;
@@ -1260,20 +1542,20 @@ function updateAdminAppointments() {
           </span>
           <div>
             <div class="flex items-center gap-2">
-              <h4 class="font-extrabold text-base text-white">${app.clientName}</h4>
+              <h4 class="font-extrabold text-base text-white">${escapeHtml(app.clientName)}</h4>
               ${hasPassed ? '<span class="text-[10px] text-slate-400 font-bold bg-white/10 px-2 py-0.5 rounded-full">🕒 Ya pasó</span>' : '<span class="text-[10px] text-emerald-400 font-bold bg-emerald-950/60 border border-emerald-500/30 px-2 py-0.5 rounded-full">Confirmado</span>'}
             </div>
             <p class="text-xs sm:text-sm text-slate-400 mt-1 flex flex-wrap items-center gap-2">
               <span class="font-medium text-amber-400">${s.name}</span>
               <span class="text-slate-600">•</span>
               <span class="inline-flex items-center gap-1 font-mono font-bold text-slate-200">
-                📞 <a href="tel:${app.phone}" class="hover:underline hover:text-amber-400">${app.phone}</a>
+                📞 <a href="tel:${escapeHtml(app.phone)}" class="hover:underline hover:text-amber-400">${escapeHtml(app.phone)}</a>
               </span>
             </p>
             ${app.notes ? `
             <div class="mt-2 p-2 bg-[#0c0e12] border border-white/10 rounded-xl text-xs text-amber-200 flex items-start gap-1.5">
               <span class="font-bold text-amber-400 flex-shrink-0">💬 Aclaración:</span>
-              <span class="italic font-medium">${app.notes}</span>
+              <span class="italic font-medium">${escapeHtml(app.notes)}</span>
             </div>
             ` : ''}
           </div>
@@ -1322,11 +1604,11 @@ function adminPromptCancelAppointment(appId) {
   details.innerHTML = `
     <div class="flex justify-between border-b border-white/10 pb-1.5">
       <span class="text-slate-400">Cliente:</span>
-      <strong class="text-white font-bold">${app.clientName}</strong>
+      <strong class="text-white font-bold">${escapeHtml(app.clientName)}</strong>
     </div>
     <div class="flex justify-between border-b border-white/10 pb-1.5">
       <span class="text-slate-400">Teléfono:</span>
-      <strong class="text-white font-mono">${app.phone}</strong>
+      <strong class="text-white font-mono">${escapeHtml(app.phone)}</strong>
     </div>
     <div class="flex justify-between border-b border-white/10 pb-1.5">
       <span class="text-slate-400">Servicio:</span>
@@ -1339,7 +1621,7 @@ function adminPromptCancelAppointment(appId) {
     ${app.notes ? `
     <div class="flex justify-between border-t border-white/10 pt-1.5 mt-1">
       <span class="text-slate-400">Aclaración:</span>
-      <span class="text-slate-300 font-medium italic text-right max-w-[200px]">"${app.notes}"</span>
+      <span class="text-slate-300 font-medium italic text-right max-w-[200px]">"${escapeHtml(app.notes)}"</span>
     </div>
     ` : ''}
   `;
@@ -1374,13 +1656,19 @@ function formatArgentineWhatsAppNumber(phone) {
   return '549' + clean;
 }
 
-function executeCancelAppointment(notifyWhatsApp) {
+async function executeCancelAppointment(notifyWhatsApp) {
   if (!appointmentToCancel) return;
   const app = appointmentToCancel;
 
-  // 1. Eliminar el turno
-  appointments = appointments.filter(a => a.id !== app.id);
-  saveAppointments();
+  // 1. Cancelar el turno en la base de datos
+  try {
+    await Api.adminCancel(app.id);
+  } catch (e) {
+    console.error('Error cancelando turno:', e);
+    alert('No se pudo cancelar el turno. Revisá la conexión e intentá de nuevo.');
+    return;
+  }
+  refreshData();
 
   // 2. Si se solicitó avisar, abrir WhatsApp con mensaje redactado
   if (notifyWhatsApp) {
@@ -1403,7 +1691,6 @@ function renderAdminScheduleSlots() {
   const container = document.getElementById('adminScheduleSlotsGrid');
   if (!container) return;
 
-  disabledSlotsByDate = getStoredDisabledSlots();
   const disabledForDate = disabledSlotsByDate[adminSelectedDate] || [];
 
   const morningSlots = TIME_SLOTS.filter(t => parseInt(t.split(':')[0], 10) < 14);
@@ -1438,9 +1725,9 @@ function renderAdminScheduleSlots() {
             <div class="flex items-center gap-2.5">
               <span class="font-mono text-xs text-slate-500 line-through bg-white/5 px-2.5 py-1.5 rounded-lg">${time} hs</span>
               <div>
-                <span class="text-xs font-bold text-slate-400 block">${bookedApp.clientName} (Finalizado)</span>
-                <span class="text-[11px] text-slate-500 block">${s.name} • 📞 ${bookedApp.phone}</span>
-                ${bookedApp.notes ? `<span class="text-[10px] text-slate-500 italic block mt-0.5">💬 "${bookedApp.notes}"</span>` : ''}
+                <span class="text-xs font-bold text-slate-400 block">${escapeHtml(bookedApp.clientName)} (Finalizado)</span>
+                <span class="text-[11px] text-slate-500 block">${s.name} • 📞 ${escapeHtml(bookedApp.phone)}</span>
+                ${bookedApp.notes ? `<span class="text-[10px] text-slate-500 italic block mt-0.5">💬 "${escapeHtml(bookedApp.notes)}"</span>` : ''}
               </div>
             </div>
             <span class="text-[10px] text-slate-400 font-semibold px-2.5 py-1 bg-white/10 rounded-lg border border-white/5">Finalizado</span>
@@ -1454,9 +1741,9 @@ function renderAdminScheduleSlots() {
           <div class="flex items-center gap-2.5">
             <span class="font-mono font-extrabold text-xs bg-gradient-to-br from-amber-400 to-amber-500 text-slate-950 px-2.5 py-1.5 rounded-lg shadow-xs">${time} hs</span>
             <div>
-              <span class="text-xs sm:text-sm font-bold text-white block">${bookedApp.clientName}</span>
-              <span class="text-[11px] text-slate-400 block">${s.name} • 📞 ${bookedApp.phone}</span>
-              ${bookedApp.notes ? `<span class="text-[11px] text-amber-300 font-medium italic block mt-0.5">💬 "${bookedApp.notes}"</span>` : ''}
+              <span class="text-xs sm:text-sm font-bold text-white block">${escapeHtml(bookedApp.clientName)}</span>
+              <span class="text-[11px] text-slate-400 block">${s.name} • 📞 ${escapeHtml(bookedApp.phone)}</span>
+              ${bookedApp.notes ? `<span class="text-[11px] text-amber-300 font-medium italic block mt-0.5">💬 "${escapeHtml(bookedApp.notes)}"</span>` : ''}
             </div>
           </div>
           <button onclick="adminPromptCancelAppointment('${bookedApp.id}')" class="px-3 py-1.5 text-xs font-bold bg-red-950/40 text-red-300 border border-red-800/40 rounded-xl hover:bg-red-900/50 flex-shrink-0 transition shadow-xs">
@@ -1553,10 +1840,7 @@ function renderAdminScheduleSlots() {
   safeRenderIcons();
 }
 
-function adminToggleShiftSlots(shift, disableAll) {
-  if (!disabledSlotsByDate[adminSelectedDate]) {
-    disabledSlotsByDate[adminSelectedDate] = [];
-  }
+async function adminToggleShiftSlots(shift, disableAll) {
 
   const slots = shift === 'morning' 
     ? TIME_SLOTS.filter(t => parseInt(t.split(':')[0], 10) < 14)
@@ -1573,36 +1857,30 @@ function adminToggleShiftSlots(shift, disableAll) {
     }
 
     if (!confirm(msg)) return;
-
-    slots.forEach(time => {
-      if (!disabledSlotsByDate[adminSelectedDate].includes(time)) {
-        disabledSlotsByDate[adminSelectedDate].push(time);
-      }
-    });
-  } else {
-    // Habilitar todos los turnos de este turno
-    disabledSlotsByDate[adminSelectedDate] = disabledSlotsByDate[adminSelectedDate].filter(t => !slots.includes(t));
   }
 
-  saveDisabledSlots();
+  try {
+    await Api.setSlotsDisabled(adminSelectedDate, slots, disableAll);
+  } catch (e) {
+    console.error('Error actualizando horarios:', e);
+    alert('No se pudieron actualizar los horarios. Intentá de nuevo.');
+  }
+  await refreshData();
 }
 
-function adminToggleSlot(dateKey, time, currentlyDisabled) {
-  if (!disabledSlotsByDate[dateKey]) {
-    disabledSlotsByDate[dateKey] = [];
+async function adminToggleSlot(dateKey, time, currentlyDisabled) {
+  try {
+    await Api.setSlotsDisabled(dateKey, [time], !currentlyDisabled);
+  } catch (e) {
+    console.error('Error actualizando horario:', e);
+    alert('No se pudo actualizar el horario. Intentá de nuevo.');
   }
-
-  if (currentlyDisabled) {
-    disabledSlotsByDate[dateKey] = disabledSlotsByDate[dateKey].filter(t => t !== time);
-  } else {
-    if (!disabledSlotsByDate[dateKey].includes(time)) {
-      disabledSlotsByDate[dateKey].push(time);
-    }
-  }
-
-  saveDisabledSlots();
+  await refreshData();
 }
 
 document.addEventListener('DOMContentLoaded', () => {
   showWelcomeScreen();
+  const demoBanner = document.getElementById('demoModeBanner');
+  if (demoBanner) demoBanner.classList.toggle('hidden', USE_FIREBASE);
+  refreshData();
 });
