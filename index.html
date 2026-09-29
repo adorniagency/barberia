@@ -7,6 +7,19 @@
   
   <!-- Tailwind CSS -->
   <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    // Dorado apagado: reemplaza el amarillo "amber" de Tailwind en toda la web
+    window.tailwind = window.tailwind || {};
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            amber: { 50:'#faf6ec',100:'#f2e9d2',200:'#e5d5ad',300:'#d4bd87',400:'#c2a66b',500:'#ab9057',600:'#8e7748',700:'#6f5d39',800:'#51442b',900:'#372e1e',950:'#211b11' }
+          }
+        }
+      }
+    };
+  </script>
   
   <!-- Lucide Icons con CDN redundante para máxima compatibilidad móvil -->
   <script src="https://unpkg.com/lucide@latest"></script>
