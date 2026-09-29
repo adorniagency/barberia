@@ -130,17 +130,15 @@ function escapeHtml(value) {
 const CFG = window.BARBERIA_CONFIG || {};
 const USE_FIREBASE = !!(CFG.firebase && CFG.firebase.apiKey && CFG.firebase.projectId && window.firebase);
 let fbDb = null;
-let fbAuth = null;
 if (USE_FIREBASE) {
   firebase.initializeApp(CFG.firebase);
   fbDb = firebase.firestore();
-  fbAuth = firebase.auth();
 }
 
 const LS_APPS = 'barberia_paco_appointments';
 const LS_DISABLED = 'barberia_paco_disabled_slots';
 const LS_MY_BOOKINGS = 'barberia_paco_my_bookings'; // [{ id, token }]
-const DEMO_PASSWORD = 'demo'; // Solo modo prueba (sin Firebase). Nunca protege datos reales.
+const ADMIN_PIN = String(CFG.adminPin || '1234'); // PIN del panel del barbero
 
 // Limpieza única de claves viejas (nombre anterior del proyecto y formato anterior)
 (function cleanupLegacyStorage() {
@@ -214,15 +212,6 @@ function addMyBooking(id, token) {
 }
 function removeMyBooking(id) {
   lsWrite(LS_MY_BOOKINGS, getMyBookings().filter(b => b.id !== id));
-}
-
-function waitForAuthReady() {
-  return new Promise(resolve => {
-    const unsubscribe = fbAuth.onAuthStateChanged(user => {
-      unsubscribe();
-      resolve(user);
-    });
-  });
 }
 
 const Api = {
@@ -386,44 +375,19 @@ const Api = {
   },
 
   // ---- Acceso del barbero ----
+  // Acceso al panel con un PIN simple (config.js → adminPin, por defecto 1234).
+  // OJO: es solo una puerta en la web; los datos quedan abiertos en la base (ver firestore.rules).
   async isBarberLoggedIn() {
-    if (!USE_FIREBASE) {
-      try { return sessionStorage.getItem('barberia_paco_demo_admin') === '1'; } catch (e) { return false; }
-    }
-    const user = fbAuth.currentUser || await waitForAuthReady();
-    if (!user) return false;
-    return Api.checkBarberAccess();
-  },
-
-  // Las reglas de Firestore deciden: solo el barbero puede listar turnos
-  async checkBarberAccess() {
-    try {
-      await fbDb.collection('appointments').where('date', '>=', getDateKey(0)).limit(1).get();
-      return true;
-    } catch (e) {
-      return false;
-    }
+    try { return sessionStorage.getItem('barberia_paco_admin') === '1'; } catch (e) { return false; }
   },
 
   async login(email, password) {
-    if (!USE_FIREBASE) {
-      if (password !== DEMO_PASSWORD) throw new Error('bad');
-      try { sessionStorage.setItem('barberia_paco_demo_admin', '1'); } catch (e) {}
-      return;
-    }
-    await fbAuth.signInWithEmailAndPassword(email, password);
-    if (!(await Api.checkBarberAccess())) {
-      await fbAuth.signOut();
-      throw new Error('not_barber');
-    }
+    if (password !== ADMIN_PIN) throw new Error('bad');
+    try { sessionStorage.setItem('barberia_paco_admin', '1'); } catch (e) {}
   },
 
   async logout() {
-    if (!USE_FIREBASE) {
-      try { sessionStorage.removeItem('barberia_paco_demo_admin'); } catch (e) {}
-      return;
-    }
-    await fbAuth.signOut();
+    try { sessionStorage.removeItem('barberia_paco_admin'); } catch (e) {}
   }
 };
 
@@ -1275,8 +1239,7 @@ async function verifyAdminLogin(e) {
 
   if (btn) btn.disabled = true;
   try {
-    // Solo contraseña: el email del barbero viene de config.js
-    await Api.login(CFG.barberEmail || '', password);
+    await Api.login('', password);
     closeAdminLoginModal();
     openAdminModal();
   } catch (err) {
